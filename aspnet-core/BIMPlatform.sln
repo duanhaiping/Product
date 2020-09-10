@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIMPlatform.EntityFramework
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CA9AC87F-097E-4F15-8393-4BC07735A5B0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{04DBDB01-70F4-4E06-B468-8F87850B22BE}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIMPlatform.EntityFrameworkCore.DbMigrations", "src\BIMPlatform.EntityFrameworkCore.DbMigrations\BIMPlatform.EntityFrameworkCore.DbMigrations.csproj", "{0372FA84-C517-4EB3-9A9F-B9ACAC0CA5E0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIMPlatform.HttpApi", "src\BIMPlatform.HttpApi\BIMPlatform.HttpApi.csproj", "{4164BDF7-F527-4E85-9CE6-E3C2D7426A27}"
@@ -28,6 +30,16 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIMPlatform.Application.Contracts", "src\BIMPlatform.Application.Contracts\BIMPlatform.Application.Contracts.csproj", "{847D3B7F-8F32-4728-A142-FE6B26C1538D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIMPlatform.Domain.Shared", "src\BIMPlatform.Domain.Shared\BIMPlatform.Domain.Shared.csproj", "{60CEC37C-A2AB-49EC-8F2F-620C4C7788C3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIMPlatform.Application.Tests", "test\BIMPlatform.Application.Tests\BIMPlatform.Application.Tests.csproj", "{15009919-7724-4875-827A-BB46B91BC8FA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIMPlatform.Domain.Tests", "test\BIMPlatform.Domain.Tests\BIMPlatform.Domain.Tests.csproj", "{B921CD2A-1E56-4913-A296-91ADE8F91F22}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIMPlatform.EntityFrameworkCore.Tests", "test\BIMPlatform.EntityFrameworkCore.Tests\BIMPlatform.EntityFrameworkCore.Tests.csproj", "{06F6559F-1261-455A-BB01-9D12954E447A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIMPlatform.HttpApi.Client.ConsoleTestApp", "test\BIMPlatform.HttpApi.Client.ConsoleTestApp\BIMPlatform.HttpApi.Client.ConsoleTestApp.csproj", "{C21E1E0A-B35F-4E78-AB90-D9342AD9CB90}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIMPlatform.TestBase", "test\BIMPlatform.TestBase\BIMPlatform.TestBase.csproj", "{90E2FBAD-0847-43C7-A127-6EF92446A681}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,6 +95,26 @@ Global
 		{60CEC37C-A2AB-49EC-8F2F-620C4C7788C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{60CEC37C-A2AB-49EC-8F2F-620C4C7788C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{60CEC37C-A2AB-49EC-8F2F-620C4C7788C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15009919-7724-4875-827A-BB46B91BC8FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15009919-7724-4875-827A-BB46B91BC8FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15009919-7724-4875-827A-BB46B91BC8FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15009919-7724-4875-827A-BB46B91BC8FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B921CD2A-1E56-4913-A296-91ADE8F91F22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B921CD2A-1E56-4913-A296-91ADE8F91F22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B921CD2A-1E56-4913-A296-91ADE8F91F22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B921CD2A-1E56-4913-A296-91ADE8F91F22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06F6559F-1261-455A-BB01-9D12954E447A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06F6559F-1261-455A-BB01-9D12954E447A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06F6559F-1261-455A-BB01-9D12954E447A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06F6559F-1261-455A-BB01-9D12954E447A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C21E1E0A-B35F-4E78-AB90-D9342AD9CB90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C21E1E0A-B35F-4E78-AB90-D9342AD9CB90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C21E1E0A-B35F-4E78-AB90-D9342AD9CB90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C21E1E0A-B35F-4E78-AB90-D9342AD9CB90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90E2FBAD-0847-43C7-A127-6EF92446A681}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90E2FBAD-0847-43C7-A127-6EF92446A681}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90E2FBAD-0847-43C7-A127-6EF92446A681}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90E2FBAD-0847-43C7-A127-6EF92446A681}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,6 +132,11 @@ Global
 		{5B1AF5B3-E384-4E56-9974-7AFF10036499} = {CA9AC87F-097E-4F15-8393-4BC07735A5B0}
 		{847D3B7F-8F32-4728-A142-FE6B26C1538D} = {CA9AC87F-097E-4F15-8393-4BC07735A5B0}
 		{60CEC37C-A2AB-49EC-8F2F-620C4C7788C3} = {CA9AC87F-097E-4F15-8393-4BC07735A5B0}
+		{15009919-7724-4875-827A-BB46B91BC8FA} = {04DBDB01-70F4-4E06-B468-8F87850B22BE}
+		{B921CD2A-1E56-4913-A296-91ADE8F91F22} = {04DBDB01-70F4-4E06-B468-8F87850B22BE}
+		{06F6559F-1261-455A-BB01-9D12954E447A} = {04DBDB01-70F4-4E06-B468-8F87850B22BE}
+		{C21E1E0A-B35F-4E78-AB90-D9342AD9CB90} = {04DBDB01-70F4-4E06-B468-8F87850B22BE}
+		{90E2FBAD-0847-43C7-A127-6EF92446A681} = {04DBDB01-70F4-4E06-B468-8F87850B22BE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {28315BFD-90E7-4E14-A2EA-F3D23AF4126F}
