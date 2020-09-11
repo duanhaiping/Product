@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace BIMPlatform.Controllers.Project
 {
     /// <summary>
-    /// 
+    /// 文件类操作方法
     /// </summary>
     public class DocumentController : BaseController
     {
@@ -28,12 +28,12 @@ namespace BIMPlatform.Controllers.Project
             DocumentService = documentService;
         }
         /// <summary>
-        /// ww
+        /// 上传文件
         /// </summary>
         /// <param name="uploadParams"></param>
         /// <returns></returns>
         [HttpPost]
-        [SwaggerResponse(200, "", null)]
+        [SwaggerResponse(200, "上传成功", null)]
         public async Task<ServiceResult> Upload([FromForm]DocumentUploadParams uploadParams)
         {
             await DocumentService.UploadAsync(uploadParams);

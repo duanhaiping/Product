@@ -22,9 +22,15 @@ namespace BIMPlatform.DocumentService.impl
             DocumentRepository = documentRepository;
         }
 
+        /// <summary>
+        /// 上传文件
+        /// </summary>
+        /// <param name="uploadParams"></param>
+        /// <returns></returns>
         public async Task UploadAsync(DocumentUploadParams uploadParams)
         {
             Document.Document document = ObjectMapper.Map<DocumentUploadParams, Document.Document>(uploadParams);
+            document.Name = uploadParams.File.FileName;
             document.Suffix = uploadParams.File.FileName.Split('.').Count() > 1 ? "." + uploadParams.File.FileName.Split('.')[1].ToLower() : string.Empty;
             document.Status= string.IsNullOrEmpty(uploadParams.Status.ToString())? "Created" : uploadParams.Status.ToString();
             document.CreationTime = DateTime.Now;
@@ -33,7 +39,6 @@ namespace BIMPlatform.DocumentService.impl
             document.IsDeleted = false;
 
             await DocumentRepository.InsertAsync(document);
-            
         }
     }
 }

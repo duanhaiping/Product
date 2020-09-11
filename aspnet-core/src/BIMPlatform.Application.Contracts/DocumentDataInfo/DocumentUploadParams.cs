@@ -9,11 +9,6 @@ namespace BIMPlatform.Application.Contracts.DocumentDataInfo
     public class DocumentUploadParams
     {
         /// <summary>
-        ///  名称
-        /// </summary>
-        [StringLength(100)]
-        public string Name { get; set; }
-        /// <summary>
         ///  状态
         /// </summary>
         public StatusEnum Status { get; set; }
