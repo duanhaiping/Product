@@ -9,6 +9,7 @@
     <OutputPath>D:\WorkFile\BIMPlatform\aspnet-core\src\BIMPlatform.HttpApi.Host\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="3.1.8" />
     <PackageReference Include="Volo.Abp.ObjectExtending" Version="2.9.0" />
     <PackageReference Include="Volo.Abp.Account.Application.Contracts" Version="2.9.0" />
     <PackageReference Include="Volo.Abp.Identity.Application.Contracts" Version="2.9.0" />

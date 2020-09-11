@@ -20,7 +20,11 @@ namespace BIMPlatform.EntityFrameworkCore
                 b.Property(x => x.Name).HasMaxLength(100).IsRequired();
                 b.Property(x => x.IsDeleted).HasDefaultValue(false);
             });
-          
+            builder.Entity<Document.Document>(b =>
+            {
+                b.ToTable(BIMPlatformConsts.DbTablePrefix_Project + "Document");
+                b.Property(x => x.IsDeleted).HasDefaultValue(false);
+            });
         }
     }
 }

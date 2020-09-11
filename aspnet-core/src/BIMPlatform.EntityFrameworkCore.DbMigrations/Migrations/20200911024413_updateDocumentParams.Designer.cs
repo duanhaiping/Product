@@ -3,15 +3,17 @@ using System;
 using BIMPlatform.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
 namespace BIMPlatform.Migrations
 {
     [DbContext(typeof(BIMPlatformMigrationsDbContext))]
-    partial class BIMPlatformMigrationsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200911024413_updateDocumentParams")]
+    partial class updateDocumentParams
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
