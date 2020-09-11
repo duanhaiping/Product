@@ -9,6 +9,14 @@
     1.Visual Studio Code 
     2.eslint
     3.node
+> 文档环境
+
+- ```
+  1.node
+  2.docsify
+  3.Typora
+  ```
+
 > 后台项目初始化搭建：
 
 1. git 下载仓库，打开文件夹aspnet-core 中的解决方案，点击解决方案，还原Nuget 程序包。![](../../attachment/image/QQ截图20200910162606.png)
@@ -26,3 +34,16 @@
 > 前端项目运行 
 
 安装环境之后， vs code  打开 vue-element-admin , 运行命令 npm install   ，还原包，npm run dev 运行
+
+> 文档环境搭建
+
+- 下载安装node 打开控制台，运行命令 
+
+```node
+npm i docsify-cli -g 
+```
+
+-  运行 start.bat ,启动即可
+- 配置typora 的图片地址，打开typora , 文件-》偏好设置-》图像，如下图配置
+
+![](../../attachment/image/QQ截图20200911134451.png)
