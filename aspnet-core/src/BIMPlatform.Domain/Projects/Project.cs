@@ -7,7 +7,7 @@ using Volo.Abp.MultiTenancy;
 
 namespace BIMPlatform.Projects
 {
-    public class Project : Entity<Guid>, IAuditedObject, ISoftDelete, IDeletionAuditedObject, IMultiTenant
+    public class Project : Entity<Guid>, IAuditedObject, IDeletionAuditedObject, IMultiTenant
     {
         public string Name { get; set; }
         public string Description { get; set; }
