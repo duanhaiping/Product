@@ -100,11 +100,67 @@ git  的目录下有三个文件 aspnet-core，Docsify和vue-element-admin ，Do
 
   实体兼容ASP.NET Core模型验证系统 ，具体参考 ASP.NET Core 内置特性
 
-2. 生成数据库迁移文件
+2. **生成数据库迁移文件**
 
    在BIMPlatform.EntityFrameworkCore文件中，在BIMPlatformDbContext 中增加自己创建的实体， public DbSet<Projects.Project> Projects { get; set; }，在BIMPlatformDbContextModelCreatingExtensions 中增加实体创建的配置信息，完成后在程序包管理器控制台中 生成迁移文件，迁移命令：add-migration [Name] , 如：add-migration init 
 
-3. 生成数据库表
+3. **生成数据库表**
 
    切换启动项目为BIMPlatform.DbMigrator ，点击运行就可以
+   
+4. **创建Dto和params**
+
+   在contracts 项目中，创建对应的领域模型文件夹project ，定义projectDto和ProjectCreateParam 的等
+
+   在接下来的service 中使用
+
+5. **创建repository** 
+
+   在domain 层中的projects 文件夹中，定义IProjectRepository 接口
+
+   在EntityFrameworkCore 层中的Repositories对应的文件夹project 下，创建实现，ProjectRepository
+
+6. **创建autoMapper 映射**
+
+   autoMapper 映射需要在BIMPlatformApplicationAutoMapperProfile 中添加映射关系，  CreateMap<Projects.Project, ProjectDto>(); CreateMap< ProjectDto, Projects.Project>();
+
+7. **创建service**
+
+   在BIMPlatform.Application 中创建ProjectService ,在文件夹下定义接口IProjectService ，新建impl 文件夹，创建接口的实现ProjectService 
+
+8. 创建api
+
+   在httpapi 层中的Controllers 下创建对应的文件夹project ，在project 文件夹中创建ProjectController ，继承BaseController ，注意项：
+
+   - route
+
+     路由采用restful 规则，基本不需要修改，只有在查询指定的id  时,需要加载[Route("{id}")] 标识
+
+   - http 类型
+
+     包含post , put , get ,delete,通用规则为，请求获取数据，只读操作使用get，新增，申请、文件上传使用post,更新，审核，审批操作使用put,删除使用delete
+
+   - 参数类型
+
+     参数类型<br/>
+
+     FromQuery : QueryString 类型传参，如api/prohect/get?name=zhangsan
+
+     FromBody:Boby 传参。参数卸载ajax 中的data 中，
+
+     FromForm:表单提交，参数来源于form表单
+
+     FromRoute ：参数来源于路由，
+
+     FromHeader：参数来源于请求头
+
+   - 返回类型
+
+     通用返回类型ServiceResult ，支持分页，列表等
+
+   - 接口文档返回类型说明
+
+      [SwaggerResponse(200, "", typeof(ServiceResult<IList<ProjectDto>>))]
+
+     各个相应状态的返回包装类型，swagger 可见
 

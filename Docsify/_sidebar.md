@@ -4,6 +4,7 @@
 * [开发](#)
 ** [开发环境](/document/programing/environment)
 ** [后台手册](/document/programing/serverManual)
+** [后台规范](/document/programing/serverRule)
 ** [前端手册](home2)
 ** [组件文档](home2)
 ** [功能函数](/README)
