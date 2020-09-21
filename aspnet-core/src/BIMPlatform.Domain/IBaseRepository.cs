@@ -39,6 +39,8 @@ namespace BIMPlatform
         /// </summary>
         IList<TEntity> FindList(Expression<Func<TEntity, bool>> expression = null, params string[] includePath);
 
+        TEntity FirstOrDefault(Expression<Func<TEntity, bool>> expression = null, params string[] includePath);
+
         IList<TEntity> FindDistinctList(Expression<Func<TEntity, bool>> expression = null, params string[] includePath);
 
         IList<TEntity> FindListByOrder<TKey>(Expression<Func<TEntity, bool>> expression = null, Expression<Func<TEntity, TKey>> orderBy = null, bool ascending = true, params string[] includePath);

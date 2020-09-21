@@ -61,10 +61,10 @@ namespace BIMPlatform.DocumentService.impl
             if (parentFolderID.HasValue)
             {
                 parentfolder = DocumentFolderRepository.FirstOrDefault(n => n.Id == parentFolderID.Value);
-                if (parentfolder == null)
-                {
-                    throw new ArgumentException(L["DocumentFolderError:FolderNotExist"]);
-                }
+                //if (parentfolder == null)
+                //{
+                //    throw new ArgumentException(L["DocumentFolderError:FolderNotExist"]);
+                //}
 
                 existingFolder = DocumentFolderRepository.FirstOrDefault(f => f.ParentFolderID == parentFolderID.Value && f.Name == folderName && f.Status == "Created");
             }

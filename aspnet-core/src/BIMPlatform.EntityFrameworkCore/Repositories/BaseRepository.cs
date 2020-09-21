@@ -16,8 +16,8 @@ namespace BIMPlatform.Repositories
     {
         public BaseRepository(IDbContextProvider<BIMPlatformDbContext> dbContextProvider) : base(dbContextProvider)
         {
-
         }
+
         public void Add(TEntity entity)
         {
             DbContext.Set<TEntity>().Add(entity);
@@ -50,8 +50,6 @@ namespace BIMPlatform.Repositories
                 DbContext.Set<TEntity>().Remove(entity);
                 this.DbContext.SaveChangesAsync();
             }
-           
-           
         }
 
         public TEntity FindByKeyValues(params object[] keyValues)
@@ -85,7 +83,11 @@ namespace BIMPlatform.Repositories
             return defaultQuery.ToList();
         }
 
-       
+        public TEntity FirstOrDefault(Expression<Func<TEntity, bool>> expression = null, params string[] includePath)
+        {
+            IQueryable<TEntity> defaultQuery = Query(expression, includePath);
+            return defaultQuery.FirstOrDefault();
+        }
 
         public IList<TEntity> LoadPageList<TKey1>(out long count, int pageIndex, int pageSize, Expression<Func<TEntity, bool>> expression = null, Expression<Func<TEntity, TKey1>> orderBy = default, bool ascending = true, params string[] includePath)
         {
@@ -120,9 +122,7 @@ namespace BIMPlatform.Repositories
                 }
             }
 
-          
             return defaultQuery;
-        }
-       
+        }      
     }
 }

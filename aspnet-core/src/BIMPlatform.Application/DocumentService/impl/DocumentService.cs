@@ -75,12 +75,12 @@ namespace BIMPlatform.DocumentService.impl
             IList<DocumentVersion> orderedLatestVersions = null;
             if (string.IsNullOrEmpty(suffix))
             {
-                orderedLatestVersions = (await DocumentVersionRepository.GetListAsync()).Where(ver => ver.FolderID == folderID && mcolVisibleStatuses.Contains(ver.Status))
+                orderedLatestVersions = DocumentVersionRepository.FindList(ver => ver.FolderID == folderID && mcolVisibleStatuses.Contains(ver.Status))
                     .GroupBy(ver => ver.Document.Id).Select(a => a.OrderByDescending(v => v.Version).FirstOrDefault()).OrderBy(ver => ver.Name).ToList();
             }
             else
             {
-                orderedLatestVersions = (await DocumentVersionRepository.GetListAsync()).Where(ver => ver.FolderID == folderID && ver.Suffix == suffix && mcolVisibleStatuses.Contains(ver.Status))
+                orderedLatestVersions = DocumentVersionRepository.FindList(ver => ver.FolderID == folderID && ver.Suffix == suffix && mcolVisibleStatuses.Contains(ver.Status))
                     .GroupBy(ver => ver.Document.Id).Select(a => a.OrderByDescending(v => v.Version).FirstOrDefault()).OrderBy(ver => ver.Name).ToList();
             }
 
@@ -96,7 +96,7 @@ namespace BIMPlatform.DocumentService.impl
 
             if (requireRecycle)
             {
-                IList<Document.Document> documents = (await DocumentRepository.GetListAsync()).Where(doc => doc.FolderID == folderID && doc.Status == "Created").ToList();
+                IList<Document.Document> documents =  DocumentRepository.FindList(doc => doc.FolderID == folderID && doc.Status == "Created");
                 foreach (Document.Document doc in documents)
                 {
                     DeleteDocument(projectID, userID, doc, true, recycleIdentity, false);
@@ -108,7 +108,7 @@ namespace BIMPlatform.DocumentService.impl
                 if (recycleIdentity != Guid.Empty)
                 {
                     IEnumerable<IGrouping<long, DocumentVersion>> groupedDocs =
-                        (await DocumentVersionRepository.GetListAsync()).Where(dv => dv.DocFolder.RecycleIdentity == recycleIdentity).GroupBy(dv => dv.Document.Id).ToList();
+                        DocumentVersionRepository.FindList(dv => dv.DocFolder.RecycleIdentity == recycleIdentity).GroupBy(dv => dv.Document.Id);
                     docVers = new List<DocumentVersion>();
 
                     foreach (IGrouping<long, DocumentVersion> groupDoc in groupedDocs)

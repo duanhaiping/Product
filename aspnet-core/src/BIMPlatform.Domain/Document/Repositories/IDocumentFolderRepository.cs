@@ -5,7 +5,7 @@ using Volo.Abp.Domain.Repositories;
 
 namespace BIMPlatform.Repositories.Document
 {
-    public interface IDocumentFolderRepository : IRepository<BIMPlatform.Document.DocumentFolder, long>
+    public interface IDocumentFolderRepository : IBaseRepository<BIMPlatform.Document.DocumentFolder, long>
     {
     }
 }

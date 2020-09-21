@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -87,7 +88,7 @@ namespace BIMPlatform.DocumentService.impl
         /// <param name="requireRecycle"></param>
         /// <param name="recycleIdentity"></param>
         /// <returns></returns>
-        public bool DeleteFolder(long folderID, bool requireRecycle, Guid recycleIdentity)
+        public bool DeleteFolder(int projectID, int userID, long folderID, bool requireRecycle, Guid recycleIdentity)
         {
             DocumentFolder folder = DocumentFolderRepository.FirstOrDefault(f => f.Id == folderID);
             if (folder == null)
@@ -95,11 +96,7 @@ namespace BIMPlatform.DocumentService.impl
                 throw new ArgumentException(L["DocumentFolderError:FolderNotExist"]);
             }
 
-            IList<string> filePaths = null;
-            /*
-             * Todo
-             */
-            //IList<string> filePaths = DeleteFolderRecursive(folderID, requireRecycle, recycleIdentity);
+            IList<string> filePaths = DeleteFolderRecursive(projectID, userID, folderID, requireRecycle, recycleIdentity).Result;
 
             #region Todo
             //if (requireRecycle)
@@ -132,8 +129,8 @@ namespace BIMPlatform.DocumentService.impl
 
             // Add parentFolder
             recursiveChildrenFolderIDs.Result.Add(parentFolderID);
-            IList<DocumentFolder> folders = (await DocumentFolderRepository.GetListAsync()).Where(f => recursiveChildrenFolderIDs.Result.Contains(f.Id)).ToList();
-            
+            IList<DocumentFolder> folders = DocumentFolderRepository.FindList(f => recursiveChildrenFolderIDs.Result.Contains(f.Id));
+
             /*
              * Todo
              */
@@ -150,6 +147,7 @@ namespace BIMPlatform.DocumentService.impl
 
                     folder.Status = "Recycled";
                     folder.RecycleIdentity = recycleIdentity;
+                    folder.IsDeleted = true;
                     DocumentFolderRepository.UpdateAsync(folder);
                 }
                 else
@@ -161,6 +159,7 @@ namespace BIMPlatform.DocumentService.impl
 
             return filePaths;
         }
+
         private IList<string> DeleteFolderCompletely(int projectID, int userID, DocumentFolder folder)
         {
             Guid recycleIdentity = folder.RecycleIdentity.HasValue ? folder.RecycleIdentity.Value : Guid.Empty;
@@ -185,7 +184,7 @@ namespace BIMPlatform.DocumentService.impl
         public async Task<List<long>> GetCurrentFolderByParent(long folderId, List<long> ids)
         {
             List<long> temp = new List<long>();
-            List<long> list = (await DocumentFolderRepository.GetListAsync()).Where(f => f.ParentFolderID == folderId && f.Status == "Created").Select(f => f.Id).ToList();
+            List<long> list = DocumentFolderRepository.FindList(f => f.ParentFolderID == folderId && f.Status == "Created").Select(f => f.Id).ToList();
 
             foreach (var id in list)
             {
@@ -194,7 +193,7 @@ namespace BIMPlatform.DocumentService.impl
             }
             foreach (var item in temp)
             {
-                await GetCurrentFolderByParent(item, ids);
+                GetCurrentFolderByParent(item, ids);
             }
             return ids;
         }
@@ -207,8 +206,8 @@ namespace BIMPlatform.DocumentService.impl
         /// <returns></returns>
         public async Task<List<DocumentFolderDto>> GetAllFolders(long rootFolderID)
         {
-            IList<DocumentFolder> allFolders = (await DocumentFolderRepository.GetListAsync()).WhereIf(true, f => f.Status == "Created").ToList();
-            DocumentFolder rootFolder = await DocumentFolderRepository.FindAsync(t => t.Id == rootFolderID);
+            IList<DocumentFolder> allFolders = DocumentFolderRepository.FindList(f => f.Status == "Created");
+            DocumentFolder rootFolder = DocumentFolderRepository.FindByKeyValues(rootFolderID);
             List<DocumentFolderDto> result = Create(allFolders.ToList(), rootFolder, null, false);
             return result;
         }

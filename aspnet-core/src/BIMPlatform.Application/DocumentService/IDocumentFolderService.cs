@@ -12,5 +12,6 @@ namespace BIMPlatform.DocumentService
         Task<List<DocumentFolderDto>> GetAllFolders(long rootFolderID);
         long CreateFolder(long? parentFolderID, string folderName);
         bool RenameFolderName(long folderId, string newName);
+        bool DeleteFolder(int projectID, int userID, long folderID, bool requireRecycle, Guid recycleIdentity);
     }
 }

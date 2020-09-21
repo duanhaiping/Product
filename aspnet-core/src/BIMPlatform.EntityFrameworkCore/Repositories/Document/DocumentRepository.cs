@@ -7,7 +7,7 @@ using Volo.Abp.EntityFrameworkCore;
 
 namespace BIMPlatform.Repositories.Document
 {
-    public class DocumentRepository : EfCoreRepository<BIMPlatformDbContext, BIMPlatform.Document.Document, long>, IDocumentRepository
+    public class DocumentRepository : BaseRepository< BIMPlatform.Document.Document, long>, IDocumentRepository
     {
         public DocumentRepository(IDbContextProvider<BIMPlatformDbContext> dbContextProvider) : base(dbContextProvider)
         {

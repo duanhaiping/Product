@@ -13,6 +13,6 @@ namespace BIMPlatform.Controllers
     public abstract class BaseController : AbpController
     {
         public int CurrentProject { get; set; }
-      
+        public int CurrentUser { get; set; }
     }
 }
