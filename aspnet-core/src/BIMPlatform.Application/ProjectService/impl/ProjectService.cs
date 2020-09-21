@@ -31,6 +31,7 @@ namespace BIMPlatform.ProjectService.impl
             project.CreatorId = CurrentUser.Id;
             project.TenantId = CurrentTenant.Id;
             project.IsDeleted = false;
+            
             var existed=  ProjectRepository.FirstOrDefault(c=>c.Name==project.Name );
             if (existed != null)
                 throw new ArgumentException(L["ProjectError:NameDuplicate"]);
@@ -42,6 +43,7 @@ namespace BIMPlatform.ProjectService.impl
         {
             Projects.Project project = await ProjectRepository.FindAsync(c => c.Id==projectID);
             await ProjectRepository.DeleteAsync(project);
+            
             
         }
        
