@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\..\common.props" />
 
@@ -54,6 +54,28 @@
     <Compile Remove="Migrations\20200724085403_Init.Designer.cs" />
     <Compile Remove="Migrations\20200910092306_document.cs" />
     <Compile Remove="Migrations\20200910092306_document.Designer.cs" />
+    <Compile Remove="Migrations\20200916063837_documentVersion.cs" />
+    <Compile Remove="Migrations\20200916063837_documentVersion.Designer.cs" />
+    <Compile Remove="Migrations\20200916064948_init.cs" />
+    <Compile Remove="Migrations\20200916064948_init.Designer.cs" />
+    <Compile Remove="Migrations\20200916081453_init.cs" />
+    <Compile Remove="Migrations\20200916081453_init.Designer.cs" />
+    <Compile Remove="Migrations\20200916081846_documentfolder.cs" />
+    <Compile Remove="Migrations\20200916081846_documentfolder.Designer.cs" />
+    <Compile Remove="Migrations\20200916082049_init.cs" />
+    <Compile Remove="Migrations\20200916082049_init.Designer.cs" />
+    <Compile Remove="Migrations\20200916082325_init.cs" />
+    <Compile Remove="Migrations\20200916082325_init.Designer.cs" />
+    <Compile Remove="Migrations\20200916082526_document.cs" />
+    <Compile Remove="Migrations\20200916082526_document.Designer.cs" />
+    <Compile Remove="Migrations\20200916082703_document.cs" />
+    <Compile Remove="Migrations\20200916082703_document.Designer.cs" />
+    <Compile Remove="Migrations\20200917021722_init.cs" />
+    <Compile Remove="Migrations\20200917021722_init.Designer.cs" />
+    <Compile Remove="Migrations\20200917021908_init.cs" />
+    <Compile Remove="Migrations\20200917021908_init.Designer.cs" />
+    <Compile Remove="Migrations\20200918080827_init.cs" />
+    <Compile Remove="Migrations\20200918080827_init.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

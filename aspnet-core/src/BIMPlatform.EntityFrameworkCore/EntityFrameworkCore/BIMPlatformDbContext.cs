@@ -26,6 +26,10 @@ namespace BIMPlatform.EntityFrameworkCore
         public DbSet<Projects.Project> Projects { get; set; }
 
         public DbSet<Document.Document> Documents { get; set; }
+
+        public DbSet<Document.DocumentVersion> DocumentVersion { get; set; }
+
+        public DbSet<Document.DocumentFolder> DocumentFolder { get; set; }
         /* Add DbSet properties for your Aggregate Roots / Entities here.
          * Also map them inside BIMPlatformDbContextModelCreatingExtensions.ConfigureBIMPlatform
          */

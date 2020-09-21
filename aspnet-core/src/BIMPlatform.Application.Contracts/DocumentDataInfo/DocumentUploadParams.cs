@@ -18,10 +18,14 @@ namespace BIMPlatform.Application.Contracts.DocumentDataInfo
         [Required]
         public long FolderID { get; set; }
         /// <summary>
+        /// 客户端路径
+        /// </summary>
+        public string ClientRelativePath { get; set; }
+        /// <summary>
         ///  文件具体信息
         /// </summary>
         [Required]
-        public IFormFile File { get; set; }
+        public List<IFormFile> Files { get; set; }
     }
 
     public enum StatusEnum

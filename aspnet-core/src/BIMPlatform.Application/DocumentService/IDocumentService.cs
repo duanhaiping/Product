@@ -11,8 +11,10 @@ using Volo.Abp.Domain.Repositories;
 
 namespace BIMPlatform.DocumentService
 {
-    public  partial interface IDocumentService
+    public partial interface IDocumentService
     {
-        Task UploadAsync(DocumentUploadParams documentFile);
+        Task UploadFile(DocumentDto document);
+        Task<IList<DocumentVersion>> GetLatestDocVersionsByFolderInternal(long folderID, string suffix);
+        Task<IList<string>> DeleteDocumentsOfFolderInternal(int projectID, int userID, long folderID, bool requireRecycle, Guid recycleIdentity);
     }
 }

@@ -10,6 +10,11 @@
     "Permission:Project": "项目管理",
     "Permission:Update": "更新",
     "ProjectError:NameDuplicate": "项目名称不可重复",
-    "ProjectError:NullObject": "不存在指定的项目"
+    "ProjectError:NullObject": "不存在指定的项目",
+    "DocumentError:NullNameOrSuffix": "文件名称或后缀不能为空",
+    "DocumentFolderError:NullName": "文件夹名称不能为空",
+    "DocumentFolderError:FolderNotExist": "文件夹不存在",
+    "DocumentFolderError:DuplicateFolderName": "该名称文件夹已存在",
+    "DocumentFolderError:RequireCurrentUserInfo": "需要当前用户信息"
   }
 }

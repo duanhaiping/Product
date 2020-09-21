@@ -25,6 +25,16 @@ namespace BIMPlatform.EntityFrameworkCore
                 b.ToTable(BIMPlatformConsts.DbTablePrefix_Project + "Document");
                 b.Property(x => x.IsDeleted).HasDefaultValue(false);
             });
+            builder.Entity<Document.DocumentVersion>(b =>
+            {
+                b.ToTable(BIMPlatformConsts.DbTablePrefix_Project + "DocumentVersion");
+                b.Property(x => x.IsDeleted).HasDefaultValue(false);
+            });
+            builder.Entity<Document.DocumentFolder>(b =>
+            {
+                b.ToTable(BIMPlatformConsts.DbTablePrefix_Project + "DocumentFolder");
+                b.Property(x => x.IsDeleted).HasDefaultValue(false);
+            });
         }
     }
 }

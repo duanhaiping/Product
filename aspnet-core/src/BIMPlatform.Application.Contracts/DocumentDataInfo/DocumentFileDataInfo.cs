@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Volo.Abp.Application.Dtos;
 
 namespace BIMPlatform.Application.Contracts.DocumentDataInfo
 {
-    public class DocumentDto : AuditedEntityDto<Guid>
+    public class DocumentFileDataInfo
     {
         /// <summary>
         /// The ID of the current upload session for multiple files, optional
@@ -62,7 +61,7 @@ namespace BIMPlatform.Application.Contracts.DocumentDataInfo
         /// </summary>
         public int CreationUserID { get; set; }
 
-        //public List<Customized> CustomizedProperties { get; set; }
+        public List<Customized> CustomizedProperties { get; set; }
 
         public bool SupportDocNumber { get; set; }
 
@@ -71,7 +70,6 @@ namespace BIMPlatform.Application.Contracts.DocumentDataInfo
         public int ProjectID { get; set; }
 
         public List<int> NotificationUserId { get; set; }
-
         public string Tags { get; set; }
 
         public string Status { get; set; }
