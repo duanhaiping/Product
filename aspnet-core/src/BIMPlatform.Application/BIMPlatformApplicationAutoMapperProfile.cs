@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using BIMPlatform.Application.Contracts.DocumentDataInfo;
+using BIMPlatform.Document;
 
 namespace BIMPlatform
 {
@@ -14,11 +16,11 @@ namespace BIMPlatform
             CreateMap<ProjectDataInfo.ProjectDto, Projects.Project>();
             CreateMap<ProjectDataInfo.ProjectCreateParams, Projects.Project>();
 
-            CreateMap<Document.Document, Application.Contracts.DocumentDataInfo.DocumentUploadParams>();
-
-            CreateMap<Application.Contracts.DocumentDataInfo.DocumentUploadParams, Document.Document>();
-            CreateMap<Document.Document, Application.Contracts.DocumentDataInfo.DocumentDto>();
-            CreateMap<Application.Contracts.DocumentDataInfo.DocumentDto, Document.Document>();
+            CreateMap<Document.Document, DocumentUploadParams>();
+            CreateMap<DocumentUploadParams, Document.Document>();
+            CreateMap<Document.Document, DocumentDto>();
+            CreateMap<DocumentDto, Document.Document>();
+            CreateMap<DocumentFolder, FolderDataInfo>();
         }
     }
 }

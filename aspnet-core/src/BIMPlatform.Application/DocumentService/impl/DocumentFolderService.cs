@@ -122,6 +122,99 @@ namespace BIMPlatform.DocumentService.impl
             return true;
         }
 
+        public FolderDataInfo GetProjectRootFolder(int projectID)
+        {
+            DocumentFolder projectRootFolder = GetProjectRootFolder(projectID, Folder.ProjectType);
+            return ObjectMapper.Map<DocumentFolder, FolderDataInfo>(projectRootFolder);
+        }
+
+        private DocumentFolder GetProjectRootFolder(int projectID, string type)
+        {
+            //Todo
+            //return FolderRepository.FirstOrDefault(f => f.ProjectRootFolders.Any(pf => pf.ProjectID == projectID && pf.Type == type));
+            return new DocumentFolder();
+        }
+
+        public List<FolderStructure> GetFolderStructure(long rootFolderID, string suffix, int userID = 0, bool getDocCount = false)
+        {
+            if (rootFolderID == 0)
+            {
+                throw new ArgumentException(L["DocumentFolderError:RequireFolderIDParameter"]);
+            }
+
+            int projectID = 0;
+            DocumentFolder rootFolder = DocumentFolderRepository.FindByKeyValues(rootFolderID);
+            
+            #region Todo
+            //if (rootFolder.ProjectRootFolders.Count > 0)
+            //{
+            //    ProjectRootFolder prf = rootFolder.ProjectRootFolders.First();
+            //    projectID = prf.ProjectID;
+            //}
+            #endregion
+
+            bool canManageAllDocuments = CanManageAllDocuments(projectID, userID);
+
+            List<DocumentFolder> folderList = null;
+            if (userID > 0 && !canManageAllDocuments)
+            {
+                folderList = GetUserAccessableFolders(projectID, userID);
+            }
+            else
+            {
+                folderList = DocumentFolderRepository.FindList(f => f.Status == "Created").OrderBy(n => n.CreationDate).ToList();
+            }
+
+            List<FolderStructure> result = Create(folderList, rootFolder, suffix, getDocCount);
+            return result;
+        }
+
+        public  bool CanManageAllDocuments(int projectID, int userID)
+        {
+            //Todo
+            //return ProjectUserRolePermissionService.HasProjectPermission(projectID, userID, "ManageAllDocuments");
+            return true;
+        }
+
+        /// <summary>
+        /// Get folders by project
+        /// </summary>
+        /// <param name="projectID"></param>
+        /// <param name="userID"></param>
+        /// <returns></returns>
+        private List<DocumentFolder> GetUserAccessableFolders(int projectID, int userID)
+        {
+            //TODO, should filter by project too
+            Dictionary<long, DocumentFolder> allFolders = new Dictionary<long, DocumentFolder>();
+            List<int> userGroupIDs = new List<int>();
+
+            #region Todo
+            ////folder: No access control configured or can accessed by this user, view is at least, so no need to check
+            //allFolders = DocumentFolderRepository.FindList(f => ((f.FolderGroupAccessControls.Count() == 0 && f.FolderUserAccessControls.Count == 0) ||
+            //                                              f.FolderAdministrators.Any(fa => fa.UserID == userID) ||
+            //                                              f.FolderUserAccessControls.Any(uac => uac.UserID == userID)) && f.Status == "Created").ToDictionary(f => f.Id);
+
+            //userGroupIDs = GroupService.GetGroupIdsByUser(userID);
+          
+            //if (userGroupIDs.Count > 0)
+            //{
+            //    Dictionary<long, DocumentFolder> groupFolders =
+            //        DocumentFolderRepository.FindList(f => f.FolderGroupAccessControls.Any(gac => userGroupIDs.Contains(gac.GroupID)) && f.Status == "Created").ToDictionary(f => f.Id);
+
+            //    foreach (DocumentFolder groupFolder in groupFolders.Values)
+            //    {
+            //        if (!allFolders.ContainsKey(groupFolder.Id))
+            //        {
+            //            allFolders[groupFolder.Id] = groupFolder;
+            //        }
+            //    }
+            //}
+            #endregion
+
+            return allFolders.Values.OrderBy(f => f.CreationDate).ToList();
+            //return allFolders.Values.OrderBy(f=>f.Name).ToList();
+        }
+
         private async Task<IList<string>> DeleteFolderRecursive(int projectID, int userID, long parentFolderID, bool requireRecycle, Guid recycleIdentity)
         {
             List<string> filePaths = new List<string>();
@@ -204,22 +297,22 @@ namespace BIMPlatform.DocumentService.impl
         /// </summary>
         /// <param name="rootFolderID"></param>
         /// <returns></returns>
-        public async Task<List<DocumentFolderDto>> GetAllFolders(long rootFolderID)
+        public async Task<List<FolderStructure>> GetAllFolders(long rootFolderID)
         {
             IList<DocumentFolder> allFolders = DocumentFolderRepository.FindList(f => f.Status == "Created");
             DocumentFolder rootFolder = DocumentFolderRepository.FindByKeyValues(rootFolderID);
-            List<DocumentFolderDto> result = Create(allFolders.ToList(), rootFolder, null, false);
+            List<FolderStructure> result = Create(allFolders.ToList(), rootFolder, null, false);
             return result;
         }
 
-        private List<DocumentFolderDto> Create(List<DocumentFolder> folderList, DocumentFolder rootFolder, string suffix, bool isCount)
+        private List<FolderStructure> Create(List<DocumentFolder> folderList, DocumentFolder rootFolder, string suffix, bool isCount)
         {
             bool requireVerify = false;
-            List<DocumentFolderDto> folders = new List<DocumentFolderDto>();
+            List<FolderStructure> folders = new List<FolderStructure>();
             bool parentRequireVerify = RequireVerifyByXml(rootFolder.Name);
-            DocumentFolderDto rootDocumentFolderDto = new DocumentFolderDto()
+            FolderStructure rootDocumentFolderDto = new FolderStructure()
             {
-                Id = rootFolder.Id,
+                ID = rootFolder.Id,
                 FolderName = rootFolder.Name,
                 CreateTime = rootFolder.CreationDate,
                 //CreateUser = rootFolder.User.DisplayName,
@@ -227,7 +320,7 @@ namespace BIMPlatform.DocumentService.impl
             };
             folders.Add(rootDocumentFolderDto);
 
-            List<DocumentFolderDto> childrenFolders = new List<DocumentFolderDto>();
+            List<FolderStructure> childrenFolders = new List<FolderStructure>();
 
             foreach (var item in folderList)
             {
@@ -241,9 +334,9 @@ namespace BIMPlatform.DocumentService.impl
                 }
                 if (item.ParentFolderID == rootFolder.Id)
                 {
-                    childrenFolders.Add(new DocumentFolderDto
+                    childrenFolders.Add(new FolderStructure
                     {
-                        Id = item.Id,
+                        ID = item.Id,
                         FolderName = item.Name,
                         Children = GetChildren(folderList, item.Id, suffix, isCount, requireVerify),
                         Count = (isCount ? GetCountByFolderID(item.Id, suffix) : 0),
@@ -302,10 +395,10 @@ namespace BIMPlatform.DocumentService.impl
             }
         }
 
-        private List<DocumentFolderDto> GetChildren(List<DocumentFolder> folderList, long id, string suffix, bool isCount, bool requireVerify)
+        private List<FolderStructure> GetChildren(List<DocumentFolder> folderList, long id, string suffix, bool isCount, bool requireVerify)
         {
             bool isVerified = false;
-            List<DocumentFolderDto> fs = new List<DocumentFolderDto>();
+            List<FolderStructure> fs = new List<FolderStructure>();
             foreach (var item in folderList)
             {
                 if (!requireVerify)
@@ -318,9 +411,9 @@ namespace BIMPlatform.DocumentService.impl
                 }
                 if (item.ParentFolderID == id)
                 {
-                    fs.Add(new DocumentFolderDto
+                    fs.Add(new FolderStructure
                     {
-                        Id = item.Id,
+                        ID = item.Id,
                         FolderName = item.Name,
                         Children = GetChildren(folderList, item.Id, suffix, isCount, isVerified),
                         Count = (isCount ? GetCountByFolderID(item.Id, suffix) : 0),

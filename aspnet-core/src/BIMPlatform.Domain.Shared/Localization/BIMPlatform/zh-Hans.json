@@ -15,6 +15,7 @@
     "DocumentFolderError:NullName": "文件夹名称不能为空",
     "DocumentFolderError:FolderNotExist": "文件夹不存在",
     "DocumentFolderError:DuplicateFolderName": "该名称文件夹已存在",
-    "DocumentFolderError:RequireCurrentUserInfo": "需要当前用户信息"
+    "DocumentFolderError:RequireCurrentUserInfo": "需要当前用户信息",
+    "DocumentFolderError:RequireFolderIDParameter": "需要文件夹ID参数"
   }
 }

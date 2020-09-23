@@ -1,4 +1,5 @@
-﻿using BIMPlatform.DocumentService;
+﻿using BIMPlatform.Application.Contracts.DocumentDataInfo;
+using BIMPlatform.DocumentService;
 using Microsoft.AspNetCore.Mvc;
 using Platform.ToolKits.Base;
 using System;
@@ -90,5 +91,24 @@ namespace BIMPlatform.Controllers.Document
             bool result = DocumentFolderService.DeleteFolder(CurrentProject, CurrentUser, folderID, true, Guid.NewGuid());
             return await ServiceResult.IsSuccess("删除成功");
         }
+
+        /// <summary>
+        /// 获取当前项目下的文件夹结构 
+        /// </summary>
+        /// <param name="libraryID"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ServiceResult> GetFolderStructure()
+        {
+            FolderDataInfo rootFolder = DocumentFolderService.GetProjectRootFolder(this.CurrentProject);
+            if (rootFolder == null)
+            {
+                return await ServiceResult<IList<FolderStructure>>.PageList(null, 0, "未找到对应的文件夹信息");
+            }
+
+            IList<FolderStructure> list = DocumentFolderService.GetFolderStructure(rootFolder.ID, null, this.CurrentUser);
+            return await ServiceResult<IList<FolderStructure>>.PageList(list, list.Count, string.Empty);
+        }
     }
 }
+  
