@@ -1,12 +1,11 @@
-﻿using BIMPlatform.Application.Contracts.DocumentDataInfo;
-using BIMPlatform.Application.Contracts.DocumentDataInfo.Domain;
+﻿using BIMPlatform.Application.Contracts.DocumentDataInfo.Domain;
 using BIMPlatform.SharedResources.Interfaces;
 using Platform.ToolKits.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace BIMPlatform.Application.Contracts.Util
+namespace BIMPlatform.Application.Contracts.DocumentDataInfo.Util
 {
     public static class DocumentUtility
     {

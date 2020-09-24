@@ -28,7 +28,7 @@ namespace BIMPlatform.Application.Contracts.DocumentDataInfo.Domain
             return Versions.OrderByDescending(ver => ver.Version).FirstOrDefault();
         }
 
-        public DocumentVersion CreateNextVersion(long targetFolderID, DocumentFileDataInfo fileInfo, UserDto creationUserInfo)
+        public DocumentVersion CreateNextVersion(long targetFolderID, DocumentFileDataInfo fileInfo, UserDataInfo.UserDataInfo creationUserInfo)
         {
             DocumentVersion currentVersion = GetLatestVersion();
             DocumentVersion nextVersion = new DocumentVersion();

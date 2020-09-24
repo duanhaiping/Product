@@ -485,6 +485,42 @@ namespace BIMPlatform.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Pro_ProjectRootFolder",
+                columns: table => new
+                {
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    FolderID = table.Column<long>(nullable: false),
+                    Type = table.Column<string>(nullable: true),
+                    CreationTime = table.Column<DateTime>(nullable: false),
+                    CreatorId = table.Column<Guid>(nullable: true),
+                    LastModifierId = table.Column<Guid>(nullable: true),
+                    LastModificationTime = table.Column<DateTime>(nullable: true),
+                    IsDeleted = table.Column<bool>(nullable: false, defaultValue: false),
+                    DeleterId = table.Column<Guid>(nullable: true),
+                    DeletionTime = table.Column<DateTime>(nullable: true),
+                    TenantId = table.Column<Guid>(nullable: true),
+                    DocFolderId = table.Column<long>(nullable: true),
+                    ProjectId = table.Column<Guid>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Pro_ProjectRootFolder", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Pro_ProjectRootFolder_Pro_DocumentFolder_DocFolderId",
+                        column: x => x.DocFolderId,
+                        principalTable: "Pro_DocumentFolder",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Pro_ProjectRootFolder_Pro_Project_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Pro_Project",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Sys_ApiClaims",
                 columns: table => new
                 {
@@ -1072,6 +1108,16 @@ namespace BIMPlatform.Migrations
                 column: "DocumentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Pro_ProjectRootFolder_DocFolderId",
+                table: "Pro_ProjectRootFolder",
+                column: "DocFolderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pro_ProjectRootFolder_ProjectId",
+                table: "Pro_ProjectRootFolder",
+                column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Sys_BackgroundJobs_IsAbandoned_NextTryTime",
                 table: "Sys_BackgroundJobs",
                 columns: new[] { "IsAbandoned", "NextTryTime" });
@@ -1235,7 +1281,7 @@ namespace BIMPlatform.Migrations
                 name: "Pro_DocumentVersion");
 
             migrationBuilder.DropTable(
-                name: "Pro_Project");
+                name: "Pro_ProjectRootFolder");
 
             migrationBuilder.DropTable(
                 name: "Sys_ApiClaims");
@@ -1329,6 +1375,9 @@ namespace BIMPlatform.Migrations
 
             migrationBuilder.DropTable(
                 name: "Pro_Document");
+
+            migrationBuilder.DropTable(
+                name: "Pro_Project");
 
             migrationBuilder.DropTable(
                 name: "Sys_ApiScopes");

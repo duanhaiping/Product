@@ -230,6 +230,59 @@ namespace BIMPlatform.Migrations
                     b.ToTable("Pro_DocumentVersion");
                 });
 
+            modelBuilder.Entity("BIMPlatform.Document.ProjectRootFolder", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long?>("DocFolderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("FolderID")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("ProjectId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocFolderId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Pro_ProjectRootFolder");
+                });
+
             modelBuilder.Entity("BIMPlatform.Projects.Project", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2002,6 +2055,17 @@ namespace BIMPlatform.Migrations
                     b.HasOne("BIMPlatform.Document.Document", "Document")
                         .WithMany("DocumentVersions")
                         .HasForeignKey("DocumentId");
+                });
+
+            modelBuilder.Entity("BIMPlatform.Document.ProjectRootFolder", b =>
+                {
+                    b.HasOne("BIMPlatform.Document.DocumentFolder", "DocFolder")
+                        .WithMany("ProjectRootFolders")
+                        .HasForeignKey("DocFolderId");
+
+                    b.HasOne("BIMPlatform.Projects.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId");
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLogAction", b =>

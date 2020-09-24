@@ -17,10 +17,13 @@ namespace BIMPlatform
             CreateMap<ProjectDataInfo.ProjectCreateParams, Projects.Project>();
 
             CreateMap<Document.Document, DocumentUploadParams>();
+            CreateMap<Document.Document, Application.Contracts.DocumentDataInfo.Domain.Document>();
+            CreateMap<Application.Contracts.DocumentDataInfo.Domain.Document, Document.Document>();
             CreateMap<DocumentUploadParams, Document.Document>();
             CreateMap<Document.Document, DocumentDto>();
             CreateMap<DocumentDto, Document.Document>();
             CreateMap<DocumentFolder, FolderDataInfo>();
+            CreateMap<DocumentVersion, Application.Contracts.DocumentDataInfo.Domain.DocumentVersion>();
         }
     }
 }

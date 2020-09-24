@@ -15,7 +15,6 @@ namespace BIMPlatform.Application.Contracts.DocumentDataInfo
         /// <summary>
         ///  所属文件夹ID
         /// </summary>
-        [Required]
         public long FolderID { get; set; }
         /// <summary>
         /// 客户端路径
@@ -26,6 +25,21 @@ namespace BIMPlatform.Application.Contracts.DocumentDataInfo
         /// </summary>
         [Required]
         public List<IFormFile> Files { get; set; }
+        /// <summary>
+        ///  所属文件夹ID(原框架定义)
+        /// </summary>
+        [Required]
+        public long CurrentNode { get; set; }
+
+        public string FileName { get; set; }
+
+        public string Part { get; set; }
+
+        public string BatchUploadID { get; set; }
+
+        public string Guid { get; set; }
+
+        public int Size { get; set; }
     }
 
     public enum StatusEnum

@@ -17,18 +17,19 @@ namespace BIMPlatform.Document
         public DateTime CreationDate { get; set; }
         public string Status { get; set; }
         public Guid? RecycleIdentity { get; set; }
-        public DateTime CreationTime { get ; set ; }
-        public Guid? CreatorId { get ; set ; }
+        public DateTime CreationTime { get; set; }
+        public Guid? CreatorId { get; set; }
         public Guid? LastModifierId { get; set; }
         public DateTime? LastModificationTime { get; set; }
-        public bool IsDeleted { get ; set ; }
-        public Guid? DeleterId { get ; set ; }
+        public bool IsDeleted { get; set; }
+        public Guid? DeleterId { get; set; }
         public DateTime? DeletionTime { get; set; }
         public Guid? TenantId { get; set; }
 
-        public  ICollection<Document> Documents { get; set; }
-        public  ICollection<DocumentVersion> DocumentVersions { get; set; }
-        public virtual ICollection<DocumentFolder> DocFolder1 { get; set; }
-        public virtual DocumentFolder DocFolder2 { get; set; }
+        public ICollection<Document> Documents { get; set; }
+        public ICollection<DocumentVersion> DocumentVersions { get; set; }
+        public ICollection<DocumentFolder> DocFolder1 { get; set; }
+        public DocumentFolder DocFolder2 { get; set; }
+        public ICollection<ProjectRootFolder> ProjectRootFolders { get; set; }
     }
 }

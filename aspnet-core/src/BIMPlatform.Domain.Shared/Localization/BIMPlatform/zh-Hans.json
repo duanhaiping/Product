@@ -11,11 +11,15 @@
     "Permission:Update": "更新",
     "ProjectError:NameDuplicate": "项目名称不可重复",
     "ProjectError:NullObject": "不存在指定的项目",
+    "DocumentError:NotExist": "文件不存在",
     "DocumentError:NullNameOrSuffix": "文件名称或后缀不能为空",
     "DocumentFolderError:NullName": "文件夹名称不能为空",
     "DocumentFolderError:FolderNotExist": "文件夹不存在",
     "DocumentFolderError:DuplicateFolderName": "该名称文件夹已存在",
     "DocumentFolderError:RequireCurrentUserInfo": "需要当前用户信息",
-    "DocumentFolderError:RequireFolderIDParameter": "需要文件夹ID参数"
+    "DocumentFolderError:RequireFolderIDParameter": "需要文件夹ID参数",
+    "DocumentFolderError:RequireDocumnetVersionIDParameter": "需要文件版本ID参数",
+    "DocumentFolderError:NoFileToDownload": "没有可下载的文件",
+    "DocumentFolderError:SameParentFolderError": "目标文件夹与源文件夹相同"
   }
 }

@@ -35,6 +35,11 @@ namespace BIMPlatform.EntityFrameworkCore
                 b.ToTable(BIMPlatformConsts.DbTablePrefix_Project + "DocumentFolder");
                 b.Property(x => x.IsDeleted).HasDefaultValue(false);
             });
+            builder.Entity<Document.ProjectRootFolder>(b =>
+            {
+                b.ToTable(BIMPlatformConsts.DbTablePrefix_Project + "ProjectRootFolder");
+                b.Property(x => x.IsDeleted).HasDefaultValue(false);
+            });
         }
     }
 }

@@ -13,8 +13,12 @@ namespace BIMPlatform.DocumentService
 {
     public partial interface IDocumentService
     {
-        Task UploadFile(DocumentDto document);
+        Task<DocumentVersion> UploadFile(int projectID, DocumentFileDataInfo document);
         Task<IList<DocumentVersion>> GetLatestDocVersionsByFolderInternal(long folderID, string suffix);
         Task<IList<string>> DeleteDocumentsOfFolderInternal(int projectID, int userID, long folderID, bool requireRecycle, Guid recycleIdentity);
+        DownloadFileItemDataInfo DownloadFiles(IList<long> versionIDs, int userId);
+        void DeleteDocumentByVersionID(int projectID, int userID, long versionID, bool requireRecycle, Guid recycleIdentity);
+        void CopyDocumentsToFolder(int projectID, long targetFolderID, List<long> documentIDs, int userID);
+        void MoveDocumentsToFolder(int projectID, long targetFolderID, List<long> documentIDs, int userID);
     }
 }

@@ -12,6 +12,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,100 +32,123 @@ namespace BIMPlatform.Controllers.Project
         {
             DocumentService = documentService;
         }
-        ///// <summary>
-        ///// 上传文件
-        ///// </summary>
-        ///// <param name="uploadParams"></param>
-        ///// <returns></returns>
-        //[HttpPost]
-        //[SwaggerResponse(200, "上传成功", null)]
-        //public async Task<ServiceResult> Upload([FromForm] DocumentUploadParams uploadParams)
-        //{
-        //    for (int i = 0; i < uploadParams.Files.Count; i++)
-        //    {
-        //        DocumentDto document = new DocumentDto() {
-        //            FolderID = uploadParams.FolderID,
-        //            Name = uploadParams.Files[i].FileName,
-        //            Suffix = Path.GetExtension(uploadParams.Files[i].FileName),
-        //            Stream = uploadParams.Files[i].OpenReadStream(),
-        //            RequireTransform = true,
-        //            SupportDocNumber = true,
-        //            ClientRelativePath = uploadParams.ClientRelativePath,
-        //        };
+        /// <summary>
+        /// 上传文件
+        /// </summary>
+        /// <param name="uploadParams"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [SwaggerResponse(200, "上传成功", null)]
+        public async Task<ServiceResult> UploadFile([FromForm] DocumentUploadParams uploadParams)
+        {
+            for (int i = 0; i < uploadParams.Files.Count; i++)
+            {
+                DocumentFileDataInfo document = new DocumentFileDataInfo()
+                {
+                    FolderID = uploadParams.CurrentNode,
+                    Name = uploadParams.Files[i].FileName,
+                    Suffix = Path.GetExtension(uploadParams.Files[i].FileName),
+                    Stream = uploadParams.Files[i].OpenReadStream(),
+                    RequireTransform = true,
+                    SupportDocNumber = true,
+                    ClientRelativePath = uploadParams.ClientRelativePath,
+                    ProjectID=CurrentProject
+                };
 
-        //        await DocumentService.UploadFile(document);
-        //    }
-        //    return await ServiceResult.IsSuccess();
-        //}
+                await DocumentService.UploadFile(CurrentProject,document);
+            }
+            return await ServiceResult.IsSuccess();
+        }
 
-        ///// <summary>
-        ///// 创建文件夹
-        ///// </summary>
-        ///// <param name="folderId"></param>
-        ///// <param name="name"></param>
-        ///// <returns></returns>
-        //[HttpPost]
-        //public async Task<ServiceResult> AddFolder([FromQuery] long folderId, string name)
-        //{
-        //    //创建文件夹
-        //    long result = DocumentFolderService.CreateFolder(folderId, name);
+        /// <summary>
+        /// 下载文件
+        /// </summary>
+        /// <param name="docID"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public DownloadFileItemDataInfo DownloadFiles(string docVersionIDs)
+        {
+            List<long> versionIDs = new List<long>();
+            foreach (var id in docVersionIDs.Split(','))
+            {
+                long versionID = 0;
+                if (long.TryParse(id, out versionID))
+                {
+                    versionIDs.Add(versionID);
+                }
+            }
 
-        //    #region Todo
-        //    //if (ControlFolderPermission)
-        //    //{
-        //    //    IList<UserDataInfo> user = AccessControlService.GetFolderAccessControlUserName(folderId);
-        //    //    foreach (var users in user)
-        //    //    {
-        //    //        IList<FolderUserAccessControlDataInfo> userresult = FolderUserPermissionService.GetFolderUserAccessControl(folderId, users.ID);
-        //    //        if (userresult.Count > 0)
-        //    //        {
-        //    //            FolderUserPermissionService.UpdateFolderAccessControl(userresult.Select(n => n.AccessControlID).ToList(), result, userresult[0].UserID);
-        //    //        }
-        //    //    }
-        //    //    IList<GroupDataInfo> group = AccessControlService.GetFolderAccessControlGroupName(folderId);
-        //    //    foreach (var groups in group)
-        //    //    {
-        //    //        IList<FolderGroupAccessControlDataInfo> groupresult = FolderGroupAccessControlService.GetFolderGroupAccessControl(folderId, groups.ID);
-        //    //        if (groupresult.Count > 0)
-        //    //        {
-        //    //            FolderGroupAccessControlService.AddFolderGroupAccessControl(groupresult.Select(n => n.AccessControlID).ToList(), result, groupresult[0].GroupID);
-        //    //        }
-        //    //    }
-        //    //    IList<FolderAdministratorDataInfo> folderadmin = FolderAdministratorService.GetFolderAdministrator(folderId);
-        //    //    foreach (var item in folderadmin)
-        //    //    {
-        //    //        FolderAdministratorService.RegisterFolderAdministrator(new FolderAdministratorDataInfo { UserID = item.UserID, FolderID = result });
-        //    //    }
-        //    //}
-        //    #endregion
+            DownloadFileItemDataInfo fileItem = DocumentService.DownloadFiles(versionIDs, this.CurrentUser);
+            return fileItem;
+        }
 
-        //    return await ServiceResult.IsSuccess();
-        //}
 
-        ///// <summary>
-        ///// 修改文件夹名称
-        ///// </summary>
-        ///// <param name="folderID"></param>
-        ///// <param name="name"></param>
-        ///// <returns></returns>
-        //[HttpPost]
-        //public async Task<ServiceResult> RenameFolderName([FromQuery] long folderID, string name)
-        //{
-        //    bool result = DocumentFolderService.RenameFolderName(folderID, name);
-        //    return await ServiceResult.IsSuccess();
-        //}
+        /// <summary>
+        /// 下载文件夹
+        /// 下载文件后，将生成的临时文件删除
+        /// </summary>
+        /// <param name="folderID"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public HttpResponseMessage DownloadFilesOfFolder(string downloadInfopath, string downloadInfoname)
+        {
+            // Depends on client whether download sub folders
+            //DownloadFolderItemDataInfo downloadInfo = DocumentService.DownloadFilesOfFolder(folderID, CurrentUser, true);
+            HttpResponseMessage result = null;
+            if (!string.IsNullOrEmpty(downloadInfopath))
+            {
+                result = new HttpResponseMessage(HttpStatusCode.OK);
+                result.Content = new StreamContent(new FileStream(downloadInfopath, FileMode.Open));
+                result.Content.Headers.ContentType =
+                    new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
+                result.Content.Headers.ContentDisposition.FileName = downloadInfoname;
+            }
+            else
+            {
+                result = new HttpResponseMessage(HttpStatusCode.NotFound);
+            }
+            return result;
+        }
 
-        ///// <summary>
-        ///// 删除文件夹及其子文件夹和文件
-        ///// </summary>
-        ///// <param name="folderID"></param>
-        ///// <returns></returns>
-        //[HttpDelete]
-        ////[APIPermissionFilter(SystemName = "DeleteDocumentFolder", Type = PermissionType.Project)]
-        //public async Task<ServiceResult> RemoveFolder([FromQuery] long folderID)
-        //{
-        //    bool result = DocumentFolderService.DeleteFolder(folderID, true, Guid.NewGuid());
-        //    return await ServiceResult.IsSuccess();
-        //}
+        /// <summary>
+        /// 删除文件(需要回收)
+        /// </summary>
+        /// <param name="docID"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public Task<ServiceResult> RemoveDocument(int docID)
+        {
+            DocumentService.DeleteDocumentByVersionID(CurrentProject, CurrentUser, docID, true, Guid.NewGuid());
+            return ServiceResult.IsSuccess();
+        }
+
+        /// <summary>
+        /// 复制文件
+        /// </summary>
+        /// <param name="folderID">target folder id</param>
+        /// <param name="docID">document id</param>
+        /// <returns></returns>
+        [HttpGet]
+        public Task<ServiceResult> CopyDocumentsToFolder(long folderID, string docIDs)
+        {
+            List<long> docIDList = docIDs.Split(',').Select(long.Parse).ToList();
+            DocumentService.CopyDocumentsToFolder(CurrentProject, folderID, docIDList, CurrentUser);
+            return ServiceResult.IsSuccess();
+        }
+
+        /// <summary>
+        /// 移动文件
+        /// </summary>
+        /// <param name="folderID"></param>
+        /// <param name="docID"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public Task<ServiceResult> MoveDocumentsToFolder(long folderID, string docIDs)
+        {
+            List<long> docIDList = docIDs.Split(',').Select(long.Parse).ToList();
+            DocumentService.MoveDocumentsToFolder(CurrentProject, folderID, docIDList, CurrentUser);
+            return ServiceResult.IsSuccess();
+        }
     }
 }
