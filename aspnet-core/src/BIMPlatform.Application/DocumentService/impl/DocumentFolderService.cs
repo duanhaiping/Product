@@ -29,8 +29,12 @@ namespace BIMPlatform.DocumentService.impl
 
         private List<string> VerifieFolderList { get; set; }
 
-        public DocumentFolderService(IDataFilter dataFilter, IDocumentFolderRepository documentFolderRepository,
-            IDocumentService documentService, IDocumentFolderCommonService documentFolderCommonService, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+        public DocumentFolderService(
+            IDataFilter dataFilter,
+            IDocumentFolderRepository documentFolderRepository,
+            IDocumentService documentService,
+            IDocumentFolderCommonService documentFolderCommonService,
+            IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             DataFilter = dataFilter;
             DocumentFolderRepository = documentFolderRepository;
@@ -89,7 +93,7 @@ namespace BIMPlatform.DocumentService.impl
         /// <param name="requireRecycle"></param>
         /// <param name="recycleIdentity"></param>
         /// <returns></returns>
-        public bool DeleteFolder(int projectID, int userID, long folderID, bool requireRecycle, Guid recycleIdentity)
+        public bool DeleteFolder(int projectID, Guid userID, long folderID, bool requireRecycle, Guid recycleIdentity)
         {
             DocumentFolder folder = DocumentFolderRepository.FirstOrDefault(f => f.Id == folderID);
             if (folder == null)
@@ -136,7 +140,7 @@ namespace BIMPlatform.DocumentService.impl
             return new DocumentFolder();
         }
 
-        public List<FolderStructure> GetFolderStructure(long rootFolderID, string suffix, int userID = 0, bool getDocCount = false)
+        public List<FolderStructure> GetFolderStructure(long rootFolderID, string suffix, Guid userID, bool getDocCount = false)
         {
             if (rootFolderID == 0)
             {
@@ -145,7 +149,7 @@ namespace BIMPlatform.DocumentService.impl
 
             int projectID = 0;
             DocumentFolder rootFolder = DocumentFolderRepository.FindByKeyValues(rootFolderID);
-            
+
             #region Todo
             //if (rootFolder.ProjectRootFolders.Count > 0)
             //{
@@ -157,7 +161,7 @@ namespace BIMPlatform.DocumentService.impl
             bool canManageAllDocuments = CanManageAllDocuments(projectID, userID);
 
             List<DocumentFolder> folderList = null;
-            if (userID > 0 && !canManageAllDocuments)
+            if (userID ==Guid.Empty && !canManageAllDocuments)
             {
                 folderList = GetUserAccessableFolders(projectID, userID);
             }
@@ -170,7 +174,7 @@ namespace BIMPlatform.DocumentService.impl
             return result;
         }
 
-        public  bool CanManageAllDocuments(int projectID, int userID)
+        public bool CanManageAllDocuments(int projectID, Guid userID)
         {
             //Todo
             //return ProjectUserRolePermissionService.HasProjectPermission(projectID, userID, "ManageAllDocuments");
@@ -183,7 +187,7 @@ namespace BIMPlatform.DocumentService.impl
         /// <param name="projectID"></param>
         /// <param name="userID"></param>
         /// <returns></returns>
-        private List<DocumentFolder> GetUserAccessableFolders(int projectID, int userID)
+        private List<DocumentFolder> GetUserAccessableFolders(int projectID, Guid userID)
         {
             //TODO, should filter by project too
             Dictionary<long, DocumentFolder> allFolders = new Dictionary<long, DocumentFolder>();
@@ -196,7 +200,7 @@ namespace BIMPlatform.DocumentService.impl
             //                                              f.FolderUserAccessControls.Any(uac => uac.UserID == userID)) && f.Status == "Created").ToDictionary(f => f.Id);
 
             //userGroupIDs = GroupService.GetGroupIdsByUser(userID);
-          
+
             //if (userGroupIDs.Count > 0)
             //{
             //    Dictionary<long, DocumentFolder> groupFolders =
@@ -216,7 +220,7 @@ namespace BIMPlatform.DocumentService.impl
             //return allFolders.Values.OrderBy(f=>f.Name).ToList();
         }
 
-        private async Task<IList<string>> DeleteFolderRecursive(int projectID, int userID, long parentFolderID, bool requireRecycle, Guid recycleIdentity)
+        private async Task<IList<string>> DeleteFolderRecursive(int projectID, Guid userID, long parentFolderID, bool requireRecycle, Guid recycleIdentity)
         {
             List<string> filePaths = new List<string>();
             Task<List<long>> recursiveChildrenFolderIDs = GetCurrentFolderByParent(parentFolderID, new List<long>());
@@ -254,7 +258,7 @@ namespace BIMPlatform.DocumentService.impl
             return filePaths;
         }
 
-        private IList<string> DeleteFolderCompletely(int projectID, int userID, DocumentFolder folder)
+        private IList<string> DeleteFolderCompletely(int projectID, Guid userID, DocumentFolder folder)
         {
             Guid recycleIdentity = folder.RecycleIdentity.HasValue ? folder.RecycleIdentity.Value : Guid.Empty;
             IList<string> paths = DocumentService.DeleteDocumentsOfFolderInternal(projectID, userID, folder.Id, false, recycleIdentity).Result;

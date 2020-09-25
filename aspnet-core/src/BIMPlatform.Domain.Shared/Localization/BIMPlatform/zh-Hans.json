@@ -11,6 +11,7 @@
     "Permission:Update": "更新",
     "ProjectError:NameDuplicate": "项目名称不可重复",
     "ProjectError:NullObject": "不存在指定的项目",
+    "UserError:NullUserId": "用户ID缺失",
     "DocumentError:NotExist": "文件不存在",
     "DocumentError:NullNameOrSuffix": "文件名称或后缀不能为空",
     "DocumentFolderError:NullName": "文件夹名称不能为空",
