@@ -2,6 +2,7 @@
 using BIMPlatform.Application.Contracts.ProjectDataInfo;
 using BIMPlatform.Project.Repositories;
 using BIMPlatform.ProjectDataInfo;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace BIMPlatform.ProjectService.impl
         private readonly IProjectRepository ProjectRepository;
        
         private readonly IDataFilter DataFilter;
-        public ProjectService(IProjectRepository projectRepository, IDataFilter dataFilter)
+        public ProjectService(IProjectRepository projectRepository, IDataFilter dataFilter ,IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
            
             DataFilter = dataFilter;

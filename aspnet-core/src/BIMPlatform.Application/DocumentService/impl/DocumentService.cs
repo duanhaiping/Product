@@ -7,6 +7,7 @@ using BIMPlatform.Repositories.Document;
 using BIMPlatform.ToolKits.Helper;
 using BIMPlatform.Users;
 using BIMPlatform.Users.Repositories;
+using Microsoft.AspNetCore.Http;
 using Platform.ToolKits.Common;
 using System;
 using System.Collections.Generic;
@@ -52,8 +53,13 @@ namespace BIMPlatform.DocumentService.impl
             get { return false; }
         }
 
-        public DocumentService(IDocumentRepository documentRepository, IDataFilter dataFilter,
-           IDocumentFolderRepository documentFolderRepository, IDocumentVersionRepository documentVersionRepository, IDocumentFolderCommonService documentFolderCommonService, IUserRepository userRepository)
+        public DocumentService(IDocumentRepository documentRepository, 
+            IDataFilter dataFilter,
+            IDocumentFolderRepository documentFolderRepository, 
+            IDocumentVersionRepository documentVersionRepository, 
+            IDocumentFolderCommonService documentFolderCommonService, 
+            IUserRepository userRepository,
+            IHttpContextAccessor httpContextAccessor):base( httpContextAccessor)
         {
             DataFilter = dataFilter;
             DocumentRepository = documentRepository;
