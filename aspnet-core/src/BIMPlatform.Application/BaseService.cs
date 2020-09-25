@@ -19,7 +19,7 @@ namespace BIMPlatform
         protected BaseService(IHttpContextAccessor  httpContextAccessor)
         {
             httpContext = httpContextAccessor;
-            CurrentProject =int.Parse( httpContextAccessor.HttpContext.Request.Headers["__currentProject"]);
+            CurrentProject = httpContextAccessor.HttpContext.Request.Headers.ContainsKey("__currentproject")? int.Parse( httpContextAccessor.HttpContext.Request.Headers["__currentproject"]) :0;
             LocalizationResource = typeof(BIMPlatformResource);
         }
        

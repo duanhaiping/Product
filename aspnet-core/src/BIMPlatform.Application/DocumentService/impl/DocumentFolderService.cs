@@ -4,6 +4,7 @@ using BIMPlatform.DocumentService;
 using BIMPlatform.Repositories.Document;
 using BIMPlatform.ToolKits.Helper;
 using log4net.Repository.Hierarchy;
+using Microsoft.AspNetCore.Http;
 using Platform.ToolKits.Extensions;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,7 @@ namespace BIMPlatform.DocumentService.impl
         private List<string> VerifieFolderList { get; set; }
 
         public DocumentFolderService(IDataFilter dataFilter, IDocumentFolderRepository documentFolderRepository,
-            IDocumentService documentService, IDocumentFolderCommonService documentFolderCommonService)
+            IDocumentService documentService, IDocumentFolderCommonService documentFolderCommonService, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             DataFilter = dataFilter;
             DocumentFolderRepository = documentFolderRepository;
