@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using BIMPlatform.Application.Contracts.DocumentDataInfo;
+using BIMPlatform.Application.Contracts.UserDataInfo;
 using BIMPlatform.Document;
+using BIMPlatform.Users;
 
 namespace BIMPlatform
 {
@@ -24,6 +26,8 @@ namespace BIMPlatform
             CreateMap<DocumentDto, Document.Document>();
             CreateMap<DocumentFolder, FolderDataInfo>();
             CreateMap<DocumentVersion, Application.Contracts.DocumentDataInfo.Domain.DocumentVersion>();
+            CreateMap<AppUser, UserDataInfo>();
+            CreateMap<UserDataInfo,AppUser >();
         }
     }
 }
