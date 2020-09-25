@@ -1,22 +1,22 @@
 ﻿using BIMPlatform.Application.Contracts.DocumentDataInfo;
+using BIMPlatform.Application.Contracts.Entity;
+using BIMPlatform.Application.Contracts.Events;
+using BIMPlatform.Application.Contracts.UserDataInfo;
+using BIMPlatform.Document;
 using BIMPlatform.Repositories.Document;
-using Microsoft.AspNetCore.Http;
+using BIMPlatform.ToolKits.Helper;
+using BIMPlatform.Users;
+using BIMPlatform.Users.Repositories;
+using Platform.ToolKits.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Volo.Abp.Data;
-using Platform.ToolKits.Extensions;
-using BIMPlatform.Document;
-using System.IO;
-using BIMPlatform.Application.Contracts.Entity;
-using Platform.ToolKits.Common;
 using System.Configuration;
-using BIMPlatform.Application.Contracts.UserDataInfo;
-using BIMPlatform.Application.Contracts.Events;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
-using BIMPlatform.ToolKits.Helper;
+using Volo.Abp.Data;
+using Volo.Abp.Identity;
 
 namespace BIMPlatform.DocumentService.impl
 {
@@ -27,6 +27,7 @@ namespace BIMPlatform.DocumentService.impl
         private readonly IDocumentFolderRepository DocumentFolderRepository;
         private readonly IDocumentVersionRepository DocumentVersionRepository;
         private readonly IDocumentFolderCommonService DocumentFolderCommonService;
+        private readonly IUserRepository UserRepository;
 
         private static object mobjLock = new object();
         private string[] mcolVisibleStatuses = new string[] { "Created", "Released", "OnVerified" };
@@ -52,15 +53,17 @@ namespace BIMPlatform.DocumentService.impl
         }
 
         public DocumentService(IDocumentRepository documentRepository, IDataFilter dataFilter,
-            IDocumentFolderRepository documentFolderRepository, IDocumentVersionRepository documentVersionRepository, IDocumentFolderCommonService documentFolderCommonService)
+           IDocumentFolderRepository documentFolderRepository, IDocumentVersionRepository documentVersionRepository, IDocumentFolderCommonService documentFolderCommonService, IUserRepository userRepository)
         {
             DataFilter = dataFilter;
             DocumentRepository = documentRepository;
             DocumentFolderRepository = documentFolderRepository;
             DocumentVersionRepository = documentVersionRepository;
             DocumentFolderCommonService = documentFolderCommonService;
+            UserRepository = userRepository;
         }
 
+        #region service
         /// <summary>
         /// 上传文件
         /// </summary>
@@ -71,63 +74,17 @@ namespace BIMPlatform.DocumentService.impl
             DocumentVersion docVer = null;
             lock (mobjLock)
             {
-                docVer = UploadFileInternal(fileInfo);
-                if (projectID > 0)
-                {
-                    if (fileInfo.NotificationUserId != null)
-                    {
-                        // For each @User, send reminder to him
-                        foreach (var userId in fileInfo.NotificationUserId)
-                        {
-                            SubscribeDocumentVersionEvent(docVer, userId, "DocumentUploadReminder", NotificationType.EmailAndNotification);
-                        }
-
-                        // Subscribe receipt event for this document version, so that whenever user viewed the document notification
-                        // send receipt back to the creation user
-                        SubscribeDocumentVersionEvent(docVer, docVer.CreationUserID, "DocumentReceipt", NotificationType.Notification);
-                    }
-
-                    #region Todo
-                    //ProjectRelevantEntityDataInfo entityInfo = new ProjectRelevantEntityDataInfo()
-                    //{
-                    //    ProjectID = projectID,
-                    //    EntityClassName = "DocumentVersion",
-                    //    EntityKey = "ID",
-                    //    EntityValue = docVer.ID.ToString(),
-                    //    RelevantObject = docVer
-                    //};
-                    //RaiseEvent(entityInfo, "DocumentUploadReminder");
-                    #endregion
-
-                    RecordOperation(docVer, docVer.CreationUserID, OperationRecordType.DocumentUpload);
-                }
+                docVer =  UploadFileInternal(fileInfo);
             }
+            NotificationDocument(projectID, fileInfo, docVer);
             return docVer;
         }
 
+     
         public Task<IList<DocumentVersion>> GetLatestDocVersionsByFolderInternal(long folderID, string suffix)
         {
             return GetLatestDocVersionsByFolder(folderID, suffix);
         }
-
-        private async Task<IList<DocumentVersion>> GetLatestDocVersionsByFolder(long folderID, string suffix, params string[] includePath)
-        {
-            // TO improve performance, get folder id and name from DocumentVersion directly to avoid query several tables
-            IList<DocumentVersion> orderedLatestVersions = null;
-            if (string.IsNullOrEmpty(suffix))
-            {
-                orderedLatestVersions = DocumentVersionRepository.FindList(ver => ver.FolderID == folderID && mcolVisibleStatuses.Contains(ver.Status))
-                    .GroupBy(ver => ver.Document.Id).Select(a => a.OrderByDescending(v => v.Version).FirstOrDefault()).OrderBy(ver => ver.Name).ToList();
-            }
-            else
-            {
-                orderedLatestVersions = DocumentVersionRepository.FindList(ver => ver.FolderID == folderID && ver.Suffix == suffix && mcolVisibleStatuses.Contains(ver.Status))
-                    .GroupBy(ver => ver.Document.Id).Select(a => a.OrderByDescending(v => v.Version).FirstOrDefault()).OrderBy(ver => ver.Name).ToList();
-            }
-
-            return orderedLatestVersions;
-        }
-
         public async Task<IList<string>> DeleteDocumentsOfFolderInternal(int projectID, int userID, long folderID, bool requireRecycle, Guid recycleIdentity)
         {
             // Recycle a folder, auto recycle all documents of the folder but not record into Recycle Bin
@@ -174,6 +131,288 @@ namespace BIMPlatform.DocumentService.impl
             return filePaths;
         }
 
+        /// <summary>
+        /// 下载文件
+        /// </summary>
+        /// <param name="versionIDs"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public DownloadFileItemDataInfo DownloadFiles(IList<long> versionIDs, int userId)
+        {
+            DownloadFileItemDataInfo fileItem = new DownloadFileItemDataInfo();
+            string[] includePath = null; // new string[] { "Document" };
+
+            if (versionIDs.Count() == 0)
+            {
+                throw new ArgumentException(L["DocumentFolderError:RequireDocumnetVersionIDParameter"]);
+            }
+            else if (versionIDs.Count() == 1)
+            {
+                long versionID = versionIDs[0];
+                DocumentVersion docVersionEntity = DocumentVersionRepository.Query(ver => ver.Id == versionID, includePath).FirstOrDefault();
+                string fileOriPath = GetDocumentFilePath(docVersionEntity);
+
+                string viewFileRelativePath = string.Empty;
+                string viewFileFullPath = string.Empty;
+
+                GetDocFileViewInfo(docVersionEntity.Name, true, ref viewFileRelativePath, ref viewFileFullPath);
+
+                File.Copy(fileOriPath, viewFileFullPath);
+
+                fileItem.Name = docVersionEntity.Name;
+                fileItem.Path = viewFileFullPath;
+                fileItem.RelativePath = viewFileRelativePath;
+
+                RecordOperation(docVersionEntity, userId, OperationRecordType.DownloadDocument);
+            }
+            else
+            {
+                includePath = new string[] { "DocFolder" };
+                List<string[]> list = new List<string[]>();
+                IList<DocumentVersion> docVersions = DocumentVersionRepository.Query(ver => versionIDs.Contains(ver.Id), includePath).ToList();
+                string folderName = string.Empty;
+                foreach (DocumentVersion version in docVersions)
+                {
+                    string path = GetDocumentFilePath(version);
+
+                    string[] s = new string[2];
+                    if (File.Exists(path))
+                    {
+                        s[0] = path;
+                        s[1] = version.Name;
+                    }
+                    else
+                    {
+                        //ServerLogger.Error(string.Format("Cannot get file path for document {0}", version.Name));
+                        continue;
+                    }
+
+                    if (string.IsNullOrEmpty(folderName))
+                    {
+                        folderName = version.DocFolder.Name;
+                    }
+                    list.Add(s);
+
+                    RecordOperation(version, userId, OperationRecordType.DownloadDocument);
+                }
+
+                if (list.Count == 0)
+                {
+                    throw new Exception(L["DocumentFolderError:NoFileToDownload"]);
+                }
+
+                string fileName = folderName + ".zip";
+                string error = "";
+
+                string viewFileRelativePath = string.Empty;
+                string viewFileFullPath = string.Empty;
+
+                GetDocFileViewInfo(fileName, true, ref viewFileRelativePath, ref viewFileFullPath);
+
+                if (ZipHelper.Pack(list, viewFileFullPath, 6, string.Empty, out error))
+                {
+                    fileItem.Name = fileName;
+                    fileItem.Path = viewFileFullPath;
+                    fileItem.RelativePath = viewFileRelativePath;
+                }
+            }
+
+            if (File.Exists(fileItem.Path))
+            {
+                return fileItem;
+            }
+            else
+            {
+                throw new Exception(L["DocumentFolderError:NoFileToDownload"]);
+            }
+        }
+
+        public void DeleteDocumentByVersionID(int projectID, int userID, long versionID, bool requireRecycle, Guid recycleIdentity)
+        {
+            IList<string> filePaths = DeleteDocumentByVersionIDInternal(projectID, userID, versionID, requireRecycle, recycleIdentity);
+            FileUtil.DeleteFiles(filePaths);
+        }
+        /// <summary>
+        /// Copy latest version of selected document to target folder
+        /// </summary>
+        /// <param name="targetFolderID"></param>
+        /// <param name="documentIDs">document ID</param>
+        /// <param name="userID"></param>
+        public async Task CopyDocumentsToFolderAsync(int projectID, long targetFolderID, List<long> documentIDs, int userID)
+        {
+            DocumentFolder folder = DocumentFolderRepository.FindByKeyValues(targetFolderID);
+            if (folder == null)
+            {
+                throw new ArgumentException(L["DocumentFolderError: FolderNotExist"]);
+            }
+
+            string error = string.Empty;
+            if (!DocumentFolderCommonService.CanCopyDocuments(targetFolderID, documentIDs, out error))
+            {
+                throw new Exception(error);
+            }
+
+            IList<DocumentVersion> allLatestVersions = GetLatestDocVersionsByDocIDs(documentIDs);
+
+            foreach (DocumentVersion version in allLatestVersions)
+            {
+                DocumentFileDataInfo fileInfo = new DocumentFileDataInfo()
+                {
+                    FolderID = targetFolderID,
+                    Name = version.Name,
+                    Suffix = version.Suffix,
+                    CreationUserID = userID,
+                    CustomizedProperties = XmlOption.LoadPropertys(version.Properties),
+                    SupportDocNumber = true,
+                    RequireTransform = true,
+                    ProjectID = projectID,
+                    Status = version.Status
+
+                };
+                string path = Path.Combine(CommonDefine.DocDataFolderPath, version.RemotePath);
+
+                fileInfo.Stream = File.OpenRead(path);
+
+                DocumentVersion docVer =  UploadFileInternal(fileInfo);
+            }
+        }
+
+        /// <summary>
+        /// Move documents to target folder, including document versions
+        /// </summary>
+        /// <param name="targetFolderID"></param>
+        /// <param name="documentIDs"></param>
+        /// <param name="userID"></param>
+        public async Task MoveDocumentsToFolderAsync(int projectID, long targetFolderID, List<long> documentIDs, int userID)
+        {
+            // TODO, check duplidate and override method
+
+            DocumentFolder folder = DocumentFolderRepository.FindByKeyValues(targetFolderID);
+            if (folder == null)
+            {
+                throw new ArgumentException(L["DocumentFolderError:FolderNotExist"]);
+            }
+
+            string error = string.Empty;
+            if (!DocumentFolderCommonService.CanMoveDocuments(targetFolderID, documentIDs, out error))
+            {
+                throw new Exception(error);
+            }
+
+            IList<Document.Document> movedDocuments = DocumentRepository.FindList(doc => documentIDs.Contains(doc.Id));
+
+            IList<string> documentNames = movedDocuments.Select(doc => doc.Name.ToLower()).ToList();
+
+            // Check duplidate of target folder
+            Dictionary<string, Document.Document> duplicateDocuments = DocumentRepository.FindList(doc => doc.FolderID == targetFolderID && documentNames.Contains(doc.Name.ToLower())).ToDictionary(doc => doc.Name.ToLower());
+
+            List<string> removedPaths = new List<string>();
+            foreach (Document.Document doc in movedDocuments)
+            {
+                // Upgrade version
+                if (duplicateDocuments.ContainsKey(doc.Name.ToLower()))
+                {
+                    List<long> movedDocumentIDs = new List<long>();
+                    movedDocumentIDs.Add(doc.Id);
+                    string[] includePath = new string[] { "Document" };
+                    IList<DocumentVersion> allLatestVersions = GetLatestDocVersionsByDocIDs(movedDocumentIDs, includePath);
+                    DocumentVersion docVersion = allLatestVersions.FirstOrDefault();
+                    if (docVersion != null)
+                    {
+                        DocumentFileDataInfo fileInfo = new DocumentFileDataInfo()
+                        {
+                            FolderID = targetFolderID,
+                            Name = docVersion.Name,
+                            Suffix = docVersion.Suffix,
+                            CreationUserID = userID,
+                            CustomizedProperties = XmlOption.LoadPropertys(docVersion.Properties),
+                            SupportDocNumber = true,
+                            RequireTransform = true,
+                            ProjectID = projectID,
+                            Status = docVersion.Status
+
+                        };
+                        string path = Path.Combine(CommonDefine.DocDataFolderPath, docVersion.RemotePath);
+
+                        fileInfo.Stream = File.OpenRead(path);
+                        DocumentVersion docVer =  UploadFileInternal(fileInfo);
+
+                        //TransformNewDocVersion(docVer);
+
+                        IList<string> filePaths = DeleteDocumentByVersionIDInternal(projectID, userID, docVersion.Id, false, Guid.Empty);
+                        removedPaths.AddRange(filePaths);
+                    }
+                }
+                else
+                {
+                    doc.FolderID = targetFolderID;
+                    foreach (var item in doc.DocumentVersions)
+                    {
+                        item.FolderID = targetFolderID;
+                    }
+                    DocumentRepository.UpdateAsync(doc);
+                }
+            }
+
+            FileUtil.DeleteFiles(removedPaths);
+        }
+
+        #endregion
+
+        #region private service
+        private void NotificationDocument(int projectID, DocumentFileDataInfo fileInfo, DocumentVersion docVer)
+        {
+            if (projectID > 0)
+            {
+                if (fileInfo.NotificationUserId != null)
+                {
+                    // For each @User, send reminder to him
+                    foreach (var userId in fileInfo.NotificationUserId)
+                    {
+                        SubscribeDocumentVersionEvent(docVer, userId, "DocumentUploadReminder", NotificationType.EmailAndNotification);
+                    }
+
+                    // Subscribe receipt event for this document version, so that whenever user viewed the document notification
+                    // send receipt back to the creation user
+                    SubscribeDocumentVersionEvent(docVer, docVer.CreationUserID, "DocumentReceipt", NotificationType.Notification);
+                }
+
+                #region Todo
+                //ProjectRelevantEntityDataInfo entityInfo = new ProjectRelevantEntityDataInfo()
+                //{
+                //    ProjectID = projectID,
+                //    EntityClassName = "DocumentVersion",
+                //    EntityKey = "ID",
+                //    EntityValue = docVer.ID.ToString(),
+                //    RelevantObject = docVer
+                //};
+                //RaiseEvent(entityInfo, "DocumentUploadReminder");
+                #endregion
+
+                RecordOperation(docVer, docVer.CreationUserID, OperationRecordType.DocumentUpload);
+               
+            }
+        }
+
+        private async Task<IList<DocumentVersion>> GetLatestDocVersionsByFolder(long folderID, string suffix, params string[] includePath)
+        {
+            // TO improve performance, get folder id and name from DocumentVersion directly to avoid query several tables
+            IList<DocumentVersion> orderedLatestVersions = null;
+            if (string.IsNullOrEmpty(suffix))
+            {
+                orderedLatestVersions = DocumentVersionRepository.FindList(ver => ver.FolderID == folderID && mcolVisibleStatuses.Contains(ver.Status))
+                    .GroupBy(ver => ver.Document.Id).Select(a => a.OrderByDescending(v => v.Version).FirstOrDefault()).OrderBy(ver => ver.Name).ToList();
+            }
+            else
+            {
+                orderedLatestVersions = DocumentVersionRepository.FindList(ver => ver.FolderID == folderID && ver.Suffix == suffix && mcolVisibleStatuses.Contains(ver.Status))
+                    .GroupBy(ver => ver.Document.Id).Select(a => a.OrderByDescending(v => v.Version).FirstOrDefault()).OrderBy(ver => ver.Name).ToList();
+            }
+
+            return orderedLatestVersions;
+        }
+
+       
         private IList<string> DeleteDocument(int projectID, int userID, Document.Document document, bool requireRecycle, Guid recycleIdentity, bool canRestoreAsSource)
         {
             List<string> filePaths = new List<string>();
@@ -293,7 +532,7 @@ namespace BIMPlatform.DocumentService.impl
             return filePaths;
         }
 
-        protected void RecordOperation(DocumentVersion documentVersion, int userID, OperationRecordType type)
+        private void RecordOperation(DocumentVersion documentVersion, int userID, OperationRecordType type)
         {
             #region Todo
             //if (type == OperationRecordType.DocumentUpload)
@@ -372,7 +611,7 @@ namespace BIMPlatform.DocumentService.impl
         /// </summary>
         /// <param name="fileInfo"></param>
         /// <returns></returns>
-        public DocumentVersion UploadFileInternal(DocumentFileDataInfo fileInfo)
+        private DocumentVersion UploadFileInternal(DocumentFileDataInfo fileInfo)
         {
             if (string.IsNullOrEmpty(fileInfo.Name) || string.IsNullOrEmpty(fileInfo.Suffix))
             {
@@ -392,6 +631,8 @@ namespace BIMPlatform.DocumentService.impl
 
             UserDataInfo userInfo = new UserDataInfo();
             #region Todo
+            AppUser user = UserRepository.FindByKeyValues(CurrentUser.Id.Value);
+            userInfo = ObjectMapper.Map<AppUser, UserDataInfo>(user);
             //UserDataInfo userInfo = ApplicationService.Instance.CacheService.GetUserInfo(fileInfo.CreationUserID);
             #endregion
 
@@ -477,7 +718,7 @@ namespace BIMPlatform.DocumentService.impl
             return nextDocVerionEntity;
         }
 
-        public string GetDocNumber(DocumentFileDataInfo fileInfo, Application.Contracts.DocumentDataInfo.Domain.Document documentObj)
+        private string GetDocNumber(DocumentFileDataInfo fileInfo, Application.Contracts.DocumentDataInfo.Domain.Document documentObj)
         {
             string folderName = DocumentFolderRepository.FirstOrDefault(n => n.Id == fileInfo.FolderID).Name;
             DocumentFolder folder = GetParentFolder(fileInfo.FolderID);
@@ -525,7 +766,7 @@ namespace BIMPlatform.DocumentService.impl
             return targetFolder;
         }
 
-        protected void TransformNewDocVersion(int projectID, DocumentVersion docVer)
+        private void TransformNewDocVersion(int projectID, DocumentVersion docVer)
         {
             if (docVer != null && SupportPreviewDocument)
             {
@@ -542,111 +783,10 @@ namespace BIMPlatform.DocumentService.impl
             }
         }
 
-        protected virtual void SubscribeDocumentVersionEvent(DocumentVersion docVer, int userID, string eventSystemName, NotificationType type)
+        private  void SubscribeDocumentVersionEvent(DocumentVersion docVer, int userID, string eventSystemName, NotificationType type)
         {
             EntityDataInfo entityInfo = new EntityDataInfo() { EntityClassName = "DocumentVersion", EntityKey = "ID", EntityValue = docVer.Id.ToString() };
             SubscribeEvent(entityInfo, userID, eventSystemName, type);
-        }
-
-        public override void SubscribeEvent(EntityDataInfo entityInfo, int userID, string eventSystemName, NotificationType type)
-        {
-            base.SubscribeEvent(entityInfo, userID, eventSystemName, type);
-        }
-
-        /// <summary>
-        /// 下载文件
-        /// </summary>
-        /// <param name="versionIDs"></param>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        public DownloadFileItemDataInfo DownloadFiles(IList<long> versionIDs, int userId)
-        {
-            DownloadFileItemDataInfo fileItem = new DownloadFileItemDataInfo();
-            string[] includePath = null; // new string[] { "Document" };
-
-            if (versionIDs.Count() == 0)
-            {
-                throw new ArgumentException(L["DocumentFolderError:RequireDocumnetVersionIDParameter"]);
-            }
-            else if (versionIDs.Count() == 1)
-            {
-                long versionID = versionIDs[0];
-                DocumentVersion docVersionEntity = DocumentVersionRepository.Query(ver => ver.Id == versionID, includePath).FirstOrDefault();
-                string fileOriPath = GetDocumentFilePath(docVersionEntity);
-
-                string viewFileRelativePath = string.Empty;
-                string viewFileFullPath = string.Empty;
-
-                GetDocFileViewInfo(docVersionEntity.Name, true, ref viewFileRelativePath, ref viewFileFullPath);
-
-                File.Copy(fileOriPath, viewFileFullPath);
-
-                fileItem.Name = docVersionEntity.Name;
-                fileItem.Path = viewFileFullPath;
-                fileItem.RelativePath = viewFileRelativePath;
-
-                RecordOperation(docVersionEntity, userId, OperationRecordType.DownloadDocument);
-            }
-            else
-            {
-                includePath = new string[] { "DocFolder" };
-                List<string[]> list = new List<string[]>();
-                IList<DocumentVersion> docVersions = DocumentVersionRepository.Query(ver => versionIDs.Contains(ver.Id), includePath).ToList();
-                string folderName = string.Empty;
-                foreach (DocumentVersion version in docVersions)
-                {
-                    string path = GetDocumentFilePath(version);
-
-                    string[] s = new string[2];
-                    if (File.Exists(path))
-                    {
-                        s[0] = path;
-                        s[1] = version.Name;
-                    }
-                    else
-                    {
-                        //ServerLogger.Error(string.Format("Cannot get file path for document {0}", version.Name));
-                        continue;
-                    }
-
-                    if (string.IsNullOrEmpty(folderName))
-                    {
-                        folderName = version.DocFolder.Name;
-                    }
-                    list.Add(s);
-
-                    RecordOperation(version, userId, OperationRecordType.DownloadDocument);
-                }
-
-                if (list.Count == 0)
-                {
-                    throw new Exception(L["DocumentFolderError:NoFileToDownload"]);
-                }
-
-                string fileName = folderName + ".zip";
-                string error = "";
-
-                string viewFileRelativePath = string.Empty;
-                string viewFileFullPath = string.Empty;
-
-                GetDocFileViewInfo(fileName, true, ref viewFileRelativePath, ref viewFileFullPath);
-
-                if (ZipHelper.Pack(list, viewFileFullPath, 6, string.Empty, out error))
-                {
-                    fileItem.Name = fileName;
-                    fileItem.Path = viewFileFullPath;
-                    fileItem.RelativePath = viewFileRelativePath;
-                }
-            }
-
-            if (File.Exists(fileItem.Path))
-            {
-                return fileItem;
-            }
-            else
-            {
-                throw new Exception(L["DocumentFolderError:NoFileToDownload"]);
-            }
         }
 
         private void GetDocFileViewInfo(string fileName, bool encodeFileName, ref string viewFileRelativePath, ref string viewFileFullPath)
@@ -684,11 +824,6 @@ namespace BIMPlatform.DocumentService.impl
         /// <param name="versionID"></param>
         /// <param name="requireRecycle"></param>
         /// <param name="recycleIdentity"></param>
-        public void DeleteDocumentByVersionID(int projectID, int userID, long versionID, bool requireRecycle, Guid recycleIdentity)
-        {
-            IList<string> filePaths = DeleteDocumentByVersionIDInternal(projectID, userID, versionID, requireRecycle, recycleIdentity);
-            FileUtil.DeleteFiles(filePaths);
-        }
 
         public IList<string> DeleteDocumentByVersionIDInternal(int projectID, int userID, long versionID, bool requireRecycle, Guid recycleIdentity)
         {
@@ -709,50 +844,6 @@ namespace BIMPlatform.DocumentService.impl
             return DeleteDocument(projectID, userID, document, requireRecycle, recycleIdentity, true);
         }
 
-        /// <summary>
-        /// Copy latest version of selected document to target folder
-        /// </summary>
-        /// <param name="targetFolderID"></param>
-        /// <param name="documentIDs">document ID</param>
-        /// <param name="userID"></param>
-        public void CopyDocumentsToFolder(int projectID, long targetFolderID, List<long> documentIDs, int userID)
-        {
-            DocumentFolder folder = DocumentFolderRepository.FindByKeyValues(targetFolderID);
-            if (folder == null)
-            {
-                throw new ArgumentException(L["DocumentFolderError: FolderNotExist"]);
-            }
-
-            string error = string.Empty;
-            if (!DocumentFolderCommonService.CanCopyDocuments(targetFolderID, documentIDs, out error))
-            {
-                throw new Exception(error);
-            }
-
-            IList<DocumentVersion> allLatestVersions = GetLatestDocVersionsByDocIDs(documentIDs);
-
-            foreach (DocumentVersion version in allLatestVersions)
-            {
-                DocumentFileDataInfo fileInfo = new DocumentFileDataInfo()
-                {
-                    FolderID = targetFolderID,
-                    Name = version.Name,
-                    Suffix = version.Suffix,
-                    CreationUserID = userID,
-                    CustomizedProperties = XmlOption.LoadPropertys(version.Properties),
-                    SupportDocNumber = true,
-                    RequireTransform = true,
-                    ProjectID = projectID,
-                    Status = version.Status
-
-                };
-                string path = Path.Combine(CommonDefine.DocDataFolderPath, version.RemotePath);
-
-                fileInfo.Stream = File.OpenRead(path);
-
-                DocumentVersion docVer = UploadFileInternal(fileInfo);
-            }
-        }
 
         private IList<DocumentVersion> GetLatestDocVersionsByDocIDs(IList<long> documentIDs, params string[] includePath)
         {
@@ -764,84 +855,12 @@ namespace BIMPlatform.DocumentService.impl
             return orderedLatestVersions.ToList();
         }
 
-        /// <summary>
-        /// Move documents to target folder, including document versions
-        /// </summary>
-        /// <param name="targetFolderID"></param>
-        /// <param name="documentIDs"></param>
-        /// <param name="userID"></param>
-        public  void MoveDocumentsToFolder(int projectID, long targetFolderID, List<long> documentIDs, int userID)
+
+        #endregion
+        public override void SubscribeEvent(EntityDataInfo entityInfo, int userID, string eventSystemName, NotificationType type)
         {
-            // TODO, check duplidate and override method
-
-            DocumentFolder folder = DocumentFolderRepository.FindByKeyValues(targetFolderID);
-            if (folder == null)
-            {
-                throw new ArgumentException(L["DocumentFolderError:FolderNotExist"]);
-            }
-
-            string error = string.Empty;
-            if (!DocumentFolderCommonService.CanMoveDocuments(targetFolderID, documentIDs, out error))
-            {
-                throw new Exception(error);
-            }
-
-            IList<Document.Document> movedDocuments = DocumentRepository.FindList(doc => documentIDs.Contains(doc.Id));
-
-            IList<string> documentNames = movedDocuments.Select(doc => doc.Name.ToLower()).ToList();
-
-            // Check duplidate of target folder
-            Dictionary<string, Document.Document> duplicateDocuments = DocumentRepository.FindList(doc => doc.FolderID == targetFolderID && documentNames.Contains(doc.Name.ToLower())).ToDictionary(doc => doc.Name.ToLower());
-
-            List<string> removedPaths = new List<string>();
-            foreach (Document.Document doc in movedDocuments)
-            {
-                // Upgrade version
-                if (duplicateDocuments.ContainsKey(doc.Name.ToLower()))
-                {
-                    List<long> movedDocumentIDs = new List<long>();
-                    movedDocumentIDs.Add(doc.Id);
-                    string[] includePath = new string[] { "Document" };
-                    IList<DocumentVersion> allLatestVersions = GetLatestDocVersionsByDocIDs(movedDocumentIDs, includePath);
-                    DocumentVersion docVersion = allLatestVersions.FirstOrDefault();
-                    if (docVersion != null)
-                    {
-                        DocumentFileDataInfo fileInfo = new DocumentFileDataInfo()
-                        {
-                            FolderID = targetFolderID,
-                            Name = docVersion.Name,
-                            Suffix = docVersion.Suffix,
-                            CreationUserID = userID,
-                            CustomizedProperties = XmlOption.LoadPropertys(docVersion.Properties),
-                            SupportDocNumber = true,
-                            RequireTransform = true,
-                            ProjectID = projectID,
-                            Status = docVersion.Status
-
-                        };
-                        string path = Path.Combine(CommonDefine.DocDataFolderPath, docVersion.RemotePath);
-
-                        fileInfo.Stream = File.OpenRead(path);
-                        DocumentVersion docVer = UploadFileInternal(fileInfo);
-
-                        //TransformNewDocVersion(docVer);
-
-                        IList<string> filePaths = DeleteDocumentByVersionIDInternal(projectID, userID, docVersion.Id, false, Guid.Empty);
-                        removedPaths.AddRange(filePaths);
-                    }
-                }
-                else
-                {
-                    doc.FolderID = targetFolderID;
-                    foreach (var item in doc.DocumentVersions)
-                    {
-                        item.FolderID = targetFolderID;
-                    }
-                    DocumentRepository.UpdateAsync(doc);
-                }
-            }
-
-            FileUtil.DeleteFiles(removedPaths);
+            base.SubscribeEvent(entityInfo, userID, eventSystemName, type);
         }
+
     }
 }
