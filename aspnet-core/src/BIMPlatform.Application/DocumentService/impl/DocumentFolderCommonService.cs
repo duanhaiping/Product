@@ -3,6 +3,7 @@ using BIMPlatform.Document;
 using BIMPlatform.DocumentService;
 using BIMPlatform.Repositories.Document;
 using log4net.Repository.Hierarchy;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,7 +24,11 @@ namespace BIMPlatform.DocumentService.impl
 
         private List<string> VerifieFolderList { get; set; }
 
-        public DocumentFolderCommonService(IDataFilter dataFilter, IDocumentFolderRepository documentFolderRepository, IDocumentRepository documentRepository)
+        public DocumentFolderCommonService(
+            IDataFilter dataFilter,
+            IDocumentFolderRepository documentFolderRepository, 
+            IDocumentRepository documentRepository,
+            IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             DataFilter = dataFilter;
             DocumentFolderRepository = documentFolderRepository;
@@ -94,7 +99,7 @@ namespace BIMPlatform.DocumentService.impl
             return folder;
         }
 
-        public DocumentFolder GetOrCreateFolderByPathInternal(DocumentFolder parentFolder, int creationUserID, string folderPath)
+        public DocumentFolder GetOrCreateFolderByPathInternal(DocumentFolder parentFolder, Guid creationUserID, string folderPath)
         {
             DocumentFolder targetFolder = parentFolder;
 
@@ -106,7 +111,7 @@ namespace BIMPlatform.DocumentService.impl
             return parentFolder;
         }
 
-        private DocumentFolder BuildFolder(DocumentFolder parentFolder, string folderName, int creationUserID)
+        private DocumentFolder BuildFolder(DocumentFolder parentFolder, string folderName, Guid creationUserID)
         {
             DocumentFolder folder = DocumentFolderRepository.FirstOrDefault(f => f.ParentFolderID == parentFolder.Id && f.Name == folderName);
             if (folder == null)

@@ -59,7 +59,7 @@ namespace BIMPlatform.Application.Contracts.DocumentDataInfo
         /// <summary>
         /// Document creation user id
         /// </summary>
-        public int CreationUserID { get; set; }
+        public Guid CreationUserID { get; set; }
 
         public List<Customized> CustomizedProperties { get; set; }
 

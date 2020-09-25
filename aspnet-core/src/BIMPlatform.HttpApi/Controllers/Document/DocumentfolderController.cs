@@ -88,7 +88,7 @@ namespace BIMPlatform.Controllers.Document
         [HttpDelete]
         public async Task<ServiceResult> RemoveFolder([FromQuery] long folderID)
         {
-            bool result = DocumentFolderService.DeleteFolder(CurrentProject, CurrentUser, folderID, true, Guid.NewGuid());
+            bool result = DocumentFolderService.DeleteFolder(CurrentProject, CurrentUser.Id.Value, folderID, true, Guid.NewGuid());
             return await ServiceResult.IsSuccess("删除成功");
         }
 
@@ -106,7 +106,7 @@ namespace BIMPlatform.Controllers.Document
                 return await ServiceResult<IList<FolderStructure>>.PageList(null, 0, "未找到对应的文件夹信息");
             }
 
-            IList<FolderStructure> list = DocumentFolderService.GetFolderStructure(rootFolder.ID, null, this.CurrentUser);
+            IList<FolderStructure> list = DocumentFolderService.GetFolderStructure(rootFolder.ID, null, CurrentUser.Id.Value);
             return await ServiceResult<IList<FolderStructure>>.PageList(list, list.Count, string.Empty);
         }
     }

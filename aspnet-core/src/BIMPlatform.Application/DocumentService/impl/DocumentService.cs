@@ -53,13 +53,13 @@ namespace BIMPlatform.DocumentService.impl
             get { return false; }
         }
 
-        public DocumentService(IDocumentRepository documentRepository, 
+        public DocumentService(IDocumentRepository documentRepository,
             IDataFilter dataFilter,
-            IDocumentFolderRepository documentFolderRepository, 
-            IDocumentVersionRepository documentVersionRepository, 
-            IDocumentFolderCommonService documentFolderCommonService, 
+            IDocumentFolderRepository documentFolderRepository,
+            IDocumentVersionRepository documentVersionRepository,
+            IDocumentFolderCommonService documentFolderCommonService,
             IUserRepository userRepository,
-            IHttpContextAccessor httpContextAccessor):base( httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             DataFilter = dataFilter;
             DocumentRepository = documentRepository;
@@ -80,18 +80,18 @@ namespace BIMPlatform.DocumentService.impl
             DocumentVersion docVer = null;
             lock (mobjLock)
             {
-                docVer =  UploadFileInternal(fileInfo);
+                docVer = UploadFileInternal(fileInfo);
             }
             NotificationDocument(projectID, fileInfo, docVer);
             return docVer;
         }
 
-     
+
         public Task<IList<DocumentVersion>> GetLatestDocVersionsByFolderInternal(long folderID, string suffix)
         {
             return GetLatestDocVersionsByFolder(folderID, suffix);
         }
-        public async Task<IList<string>> DeleteDocumentsOfFolderInternal(int projectID, int userID, long folderID, bool requireRecycle, Guid recycleIdentity)
+        public async Task<IList<string>> DeleteDocumentsOfFolderInternal(int projectID, Guid userID, long folderID, bool requireRecycle, Guid recycleIdentity)
         {
             // Recycle a folder, auto recycle all documents of the folder but not record into Recycle Bin
             // Invoker will record folder recycled
@@ -143,7 +143,7 @@ namespace BIMPlatform.DocumentService.impl
         /// <param name="versionIDs"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public DownloadFileItemDataInfo DownloadFiles(IList<long> versionIDs, int userId)
+        public DownloadFileItemDataInfo DownloadFiles(IList<long> versionIDs, Guid userId)
         {
             DownloadFileItemDataInfo fileItem = new DownloadFileItemDataInfo();
             string[] includePath = null; // new string[] { "Document" };
@@ -233,7 +233,7 @@ namespace BIMPlatform.DocumentService.impl
             }
         }
 
-        public void DeleteDocumentByVersionID(int projectID, int userID, long versionID, bool requireRecycle, Guid recycleIdentity)
+        public void DeleteDocumentByVersionID(int projectID, Guid userID, long versionID, bool requireRecycle, Guid recycleIdentity)
         {
             IList<string> filePaths = DeleteDocumentByVersionIDInternal(projectID, userID, versionID, requireRecycle, recycleIdentity);
             FileUtil.DeleteFiles(filePaths);
@@ -244,7 +244,7 @@ namespace BIMPlatform.DocumentService.impl
         /// <param name="targetFolderID"></param>
         /// <param name="documentIDs">document ID</param>
         /// <param name="userID"></param>
-        public async Task CopyDocumentsToFolderAsync(int projectID, long targetFolderID, List<long> documentIDs, int userID)
+        public async Task CopyDocumentsToFolderAsync(int projectID, long targetFolderID, List<long> documentIDs, Guid userID)
         {
             DocumentFolder folder = DocumentFolderRepository.FindByKeyValues(targetFolderID);
             if (folder == null)
@@ -279,7 +279,7 @@ namespace BIMPlatform.DocumentService.impl
 
                 fileInfo.Stream = File.OpenRead(path);
 
-                DocumentVersion docVer =  UploadFileInternal(fileInfo);
+                DocumentVersion docVer = UploadFileInternal(fileInfo);
             }
         }
 
@@ -289,7 +289,7 @@ namespace BIMPlatform.DocumentService.impl
         /// <param name="targetFolderID"></param>
         /// <param name="documentIDs"></param>
         /// <param name="userID"></param>
-        public async Task MoveDocumentsToFolderAsync(int projectID, long targetFolderID, List<long> documentIDs, int userID)
+        public async Task MoveDocumentsToFolderAsync(int projectID, long targetFolderID, List<long> documentIDs, Guid userID)
         {
             // TODO, check duplidate and override method
 
@@ -341,7 +341,7 @@ namespace BIMPlatform.DocumentService.impl
                         string path = Path.Combine(CommonDefine.DocDataFolderPath, docVersion.RemotePath);
 
                         fileInfo.Stream = File.OpenRead(path);
-                        DocumentVersion docVer =  UploadFileInternal(fileInfo);
+                        DocumentVersion docVer = UploadFileInternal(fileInfo);
 
                         //TransformNewDocVersion(docVer);
 
@@ -395,8 +395,8 @@ namespace BIMPlatform.DocumentService.impl
                 //RaiseEvent(entityInfo, "DocumentUploadReminder");
                 #endregion
 
-                RecordOperation(docVer, docVer.CreationUserID, OperationRecordType.DocumentUpload);
-               
+                RecordOperation(docVer, docVer.CreatorId.GetValueOrDefault(), OperationRecordType.DocumentUpload);
+
             }
         }
 
@@ -418,8 +418,8 @@ namespace BIMPlatform.DocumentService.impl
             return orderedLatestVersions;
         }
 
-       
-        private IList<string> DeleteDocument(int projectID, int userID, Document.Document document, bool requireRecycle, Guid recycleIdentity, bool canRestoreAsSource)
+
+        private IList<string> DeleteDocument(int projectID, Guid userID, Document.Document document, bool requireRecycle, Guid recycleIdentity, bool canRestoreAsSource)
         {
             List<string> filePaths = new List<string>();
             OperationRecordType opType = OperationRecordType.RecycleDocument;
@@ -538,8 +538,12 @@ namespace BIMPlatform.DocumentService.impl
             return filePaths;
         }
 
-        private void RecordOperation(DocumentVersion documentVersion, int userID, OperationRecordType type)
+        private void RecordOperation(DocumentVersion documentVersion, Guid userID, OperationRecordType type)
         {
+            if (userID == Guid.Empty)
+            {
+                throw new ArgumentException(L["UserError:NullUserId"]);
+            }
             #region Todo
             //if (type == OperationRecordType.DocumentUpload)
             //{
@@ -568,7 +572,7 @@ namespace BIMPlatform.DocumentService.impl
         /// <param name="userID"></param>
         /// <param name="version"></param>
         /// <returns></returns>
-        private IList<string> DeleteTransformedDocument(int projectID, int userID, DocumentVersion version)
+        private IList<string> DeleteTransformedDocument(int projectID, Guid userID, DocumentVersion version)
         {
             List<string> filePaths = new List<string>();
 
@@ -630,7 +634,7 @@ namespace BIMPlatform.DocumentService.impl
                 throw new ArgumentException(L["DocumentFolderError:FolderNotExist"]);
             }
 
-            if (fileInfo.CreationUserID <= 0)
+            if (fileInfo.CreationUserID == Guid.Empty)
             {
                 throw new ArgumentException(L["DocumentFolderError:RequireCurrentUserInfo"]);
             }
@@ -789,7 +793,7 @@ namespace BIMPlatform.DocumentService.impl
             }
         }
 
-        private  void SubscribeDocumentVersionEvent(DocumentVersion docVer, int userID, string eventSystemName, NotificationType type)
+        private void SubscribeDocumentVersionEvent(DocumentVersion docVer, int userID, string eventSystemName, NotificationType type)
         {
             EntityDataInfo entityInfo = new EntityDataInfo() { EntityClassName = "DocumentVersion", EntityKey = "ID", EntityValue = docVer.Id.ToString() };
             SubscribeEvent(entityInfo, userID, eventSystemName, type);
@@ -831,7 +835,7 @@ namespace BIMPlatform.DocumentService.impl
         /// <param name="requireRecycle"></param>
         /// <param name="recycleIdentity"></param>
 
-        public IList<string> DeleteDocumentByVersionIDInternal(int projectID, int userID, long versionID, bool requireRecycle, Guid recycleIdentity)
+        public IList<string> DeleteDocumentByVersionIDInternal(int projectID, Guid userID, long versionID, bool requireRecycle, Guid recycleIdentity)
         {
             List<string> filePaths = new List<string>();
 
@@ -844,7 +848,7 @@ namespace BIMPlatform.DocumentService.impl
             return DeleteDocumentByVersion(projectID, userID, dv, requireRecycle, recycleIdentity);
         }
 
-        private IList<string> DeleteDocumentByVersion(int projectID, int userID, DocumentVersion docVersion, bool requireRecycle, Guid recycleIdentity)
+        private IList<string> DeleteDocumentByVersion(int projectID, Guid userID, DocumentVersion docVersion, bool requireRecycle, Guid recycleIdentity)
         {
             Document.Document document = DocumentRepository.FirstOrDefault(doc => doc.Id == docVersion.Document.Id, new string[] { "DocumentVersions" });
             return DeleteDocument(projectID, userID, document, requireRecycle, recycleIdentity, true);

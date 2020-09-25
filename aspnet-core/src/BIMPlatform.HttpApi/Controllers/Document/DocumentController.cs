@@ -78,7 +78,7 @@ namespace BIMPlatform.Controllers.Project
                 }
             }
 
-            DownloadFileItemDataInfo fileItem = DocumentService.DownloadFiles(versionIDs, this.CurrentUser);
+            DownloadFileItemDataInfo fileItem = DocumentService.DownloadFiles(versionIDs, CurrentUser.Id.Value);
             return fileItem;
         }
 
@@ -119,7 +119,7 @@ namespace BIMPlatform.Controllers.Project
         [HttpDelete]
         public Task<ServiceResult> RemoveDocument([FromQuery]int docID)
         {
-            DocumentService.DeleteDocumentByVersionID(CurrentProject, CurrentUser, docID, true, Guid.NewGuid());
+            DocumentService.DeleteDocumentByVersionID(CurrentProject, CurrentUser.Id.Value, docID, true, Guid.NewGuid());
             return ServiceResult.IsSuccess();
         }
 
@@ -133,7 +133,7 @@ namespace BIMPlatform.Controllers.Project
         public Task<ServiceResult> CopyDocumentsToFolder(long folderID, string docIDs)
         {
             List<long> docIDList = docIDs.Split(',').Select(long.Parse).ToList();
-            DocumentService.CopyDocumentsToFolderAsync(CurrentProject, folderID, docIDList, CurrentUser);
+            DocumentService.CopyDocumentsToFolderAsync(CurrentProject, folderID, docIDList, CurrentUser.Id.Value);
             return ServiceResult.IsSuccess();
         }
 
@@ -147,7 +147,7 @@ namespace BIMPlatform.Controllers.Project
         public Task<ServiceResult> MoveDocumentsToFolder(long folderID, string docIDs)
         {
             List<long> docIDList = docIDs.Split(',').Select(long.Parse).ToList();
-            DocumentService.MoveDocumentsToFolderAsync(CurrentProject, folderID, docIDList, CurrentUser);
+            DocumentService.MoveDocumentsToFolderAsync(CurrentProject, folderID, docIDList, CurrentUser.Id.Value);
             return ServiceResult.IsSuccess();
         }
     }

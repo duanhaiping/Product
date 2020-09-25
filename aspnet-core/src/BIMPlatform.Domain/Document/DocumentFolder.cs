@@ -13,7 +13,7 @@ namespace BIMPlatform.Document
     {
         public long? ParentFolderID { get; set; }
         public string Name { get; set; }
-        public int CreationUserID { get; set; }
+        public Guid CreationUserID { get; set; }
         public DateTime CreationDate { get; set; }
         public string Status { get; set; }
         public Guid? RecycleIdentity { get; set; }
