@@ -34,6 +34,60 @@
             public const string Update = GroupName + moduleName + PermissionType.Update;
             public const string Delete = GroupName + moduleName + PermissionType.Delete;
         }
+
+        public class Document
+        {
+            private const string moduleName = ".Document";
+            public const string Default = GroupName + moduleName + PermissionType.Default;
+            public const string Create = GroupName + moduleName + PermissionType.Create;
+            public const string Update = GroupName + moduleName + PermissionType.Update;
+            public const string Delete = GroupName + moduleName + PermissionType.Delete;
+        }
+
+        public class Organization
+        {
+            private const string moduleName = ".Organization";
+            public const string Default = GroupName + moduleName + PermissionType.Default;
+            public const string Create = GroupName + moduleName + PermissionType.Create;
+            public const string Update = GroupName + moduleName + PermissionType.Update;
+            public const string Delete = GroupName + moduleName + PermissionType.Delete;
+        }
+
+        public class User
+        {
+            private const string moduleName = ".User";
+            public const string Default = GroupName + moduleName + PermissionType.Default;
+            public const string Create = GroupName + moduleName + PermissionType.Create;
+            public const string Update = GroupName + moduleName + PermissionType.Update;
+            public const string Delete = GroupName + moduleName + PermissionType.Delete;
+        }
+
+        public class KnowledgeBase
+        {
+            private const string moduleName = ".KnowledgeBase";
+            public const string Default = GroupName + moduleName + PermissionType.Default;
+            public const string Create = GroupName + moduleName + PermissionType.Create;
+            public const string Update = GroupName + moduleName + PermissionType.Update;
+            public const string Delete = GroupName + moduleName + PermissionType.Delete;
+        }
+
+        public class SafetyIssue
+        {
+            private const string moduleName = ".SafetyIssue";
+            public const string Default = GroupName + moduleName + PermissionType.Default;
+            public const string Create = GroupName + moduleName + PermissionType.Create;
+            public const string Update = GroupName + moduleName + PermissionType.Update;
+            public const string Delete = GroupName + moduleName + PermissionType.Delete;
+        }
+
+        public class QualityIssue
+        {
+            private const string moduleName = ".QualityIssue";
+            public const string Default = GroupName + moduleName + PermissionType.Default;
+            public const string Create = GroupName + moduleName + PermissionType.Create;
+            public const string Update = GroupName + moduleName + PermissionType.Update;
+            public const string Delete = GroupName + moduleName + PermissionType.Delete;
+        }
     }
 }
        
