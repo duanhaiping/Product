@@ -13,7 +13,7 @@ namespace BIMPlatform.Swagger
 {
     public static class BIMPlatformSwaggerExtensions
     {
-          /// <summary>
+        /// <summary>
         /// 当前API版本，从appsettings.json获取
         /// </summary>
         private static readonly string version = $"v{AppSettings.ApiVersion}";
@@ -28,7 +28,7 @@ namespace BIMPlatform.Swagger
         /// </summary>
         private static readonly List<SwaggerApiInfo> ApiInfos = new List<SwaggerApiInfo>()
         {
-           
+
             new SwaggerApiInfo
             {
                 UrlPrefix = ApiGrouping.GroupName_v3,
@@ -37,17 +37,6 @@ namespace BIMPlatform.Swagger
                 {
                     Version = version,
                     Title = "BIMPlus - 通用公共接口",
-                    Description = description
-                }
-            },
-            new SwaggerApiInfo
-            {
-                UrlPrefix = ApiGrouping.GroupName_v4,
-                Name = "JWT授权接口",
-                OpenApiInfo = new OpenApiInfo
-                {
-                    Version = version,
-                    Title = "BIMPlus - JWT授权接口",
                     Description = description
                 }
             },
@@ -85,11 +74,27 @@ namespace BIMPlatform.Swagger
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "BIMPlatform.Domain.xml"));
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "BIMPlatform.Application.Contracts.xml"));
 
+
                 #region 小绿锁，JWT身份认证配置
+
+                var security = new OpenApiSecurityScheme
+                {
+                    Description = "JWT模式授权，请输入 Bearer {Token} 进行身份验证",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey
+                };
+                options.AddSecurityDefinition("oauth2", security);
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement { { security, new List<string>() } });
+                options.OperationFilter<AddResponseHeadersFilter>();
+                options.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
+                options.OperationFilter<SecurityRequirementsOperationFilter>();
+
                 #endregion
 
                 // 应用Controller的API文档描述信息
                 options.DocumentFilter<SwaggerDocumentFilter>();
+                options.OperationFilter<AddBIMPlatformHeaderParameter>();
             });
         }
 
@@ -108,7 +113,7 @@ namespace BIMPlatform.Swagger
                 });
 
                 // 模型的默认扩展深度，设置为 -1 完全隐藏模型
-                //options.DefaultModelsExpandDepth(-1);
+                options.DefaultModelsExpandDepth(-1);
                 // API文档仅展开标记
                 options.DocExpansion(DocExpansion.List);
                 // API前缀设置为空

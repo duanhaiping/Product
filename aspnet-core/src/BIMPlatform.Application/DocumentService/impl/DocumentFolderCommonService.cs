@@ -29,6 +29,7 @@ namespace BIMPlatform.DocumentService.impl
             IDocumentFolderRepository documentFolderRepository, 
             IDocumentRepository documentRepository,
             IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+
         {
             DataFilter = dataFilter;
             DocumentFolderRepository = documentFolderRepository;
