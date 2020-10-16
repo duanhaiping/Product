@@ -63,10 +63,10 @@ namespace BIMPlatform.Controllers.Project
         /// <summary>
         /// 下载文件
         /// </summary>
-        /// <param name="docID"></param>
+        /// <param name="docVersionIDs"></param>
         /// <returns></returns>
         [HttpGet]
-        public DownloadFileItemDataInfo DownloadFiles([FromQuery]string docVersionIDs)
+        public async Task<ServiceResult>  DownloadFiles([FromQuery]string docVersionIDs)
         {
             List<long> versionIDs = new List<long>();
             foreach (var id in docVersionIDs.Split(','))
@@ -79,7 +79,7 @@ namespace BIMPlatform.Controllers.Project
             }
 
             DownloadFileItemDataInfo fileItem = DocumentService.DownloadFiles(versionIDs, CurrentUser.Id.Value);
-            return fileItem;
+            return await ServiceResult< DownloadFileItemDataInfo >.IsSuccess(fileItem) ;
         }
 
 
@@ -87,10 +87,11 @@ namespace BIMPlatform.Controllers.Project
         /// 下载文件夹
         /// 下载文件后，将生成的临时文件删除
         /// </summary>
-        /// <param name="folderID"></param>
+        /// <param name="downloadInfopath"></param>
+        /// <param name="downloadInfoname"></param>
         /// <returns></returns>
         [HttpGet]
-        public HttpResponseMessage DownloadFilesOfFolder(string downloadInfopath, string downloadInfoname)
+        public HttpResponseMessage DownloadFilesOfFolder([FromQuery]string downloadInfopath, string downloadInfoname)
         {
             // Depends on client whether download sub folders
             //DownloadFolderItemDataInfo downloadInfo = DocumentService.DownloadFilesOfFolder(folderID, CurrentUser, true);
@@ -100,9 +101,11 @@ namespace BIMPlatform.Controllers.Project
                 result = new HttpResponseMessage(HttpStatusCode.OK);
                 result.Content = new StreamContent(new FileStream(downloadInfopath, FileMode.Open));
                 result.Content.Headers.ContentType =
-                    new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
-                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
-                result.Content.Headers.ContentDisposition.FileName = downloadInfoname;
+                    new MediaTypeHeaderValue("application/octet-stream");
+                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+                {
+                    FileName = downloadInfoname
+                };
             }
             else
             {
@@ -127,10 +130,10 @@ namespace BIMPlatform.Controllers.Project
         /// 复制文件
         /// </summary>
         /// <param name="folderID">target folder id</param>
-        /// <param name="docID">document id</param>
+        /// <param name="docIDs">document id </param>
         /// <returns></returns>
         [HttpGet]
-        public Task<ServiceResult> CopyDocumentsToFolder(long folderID, string docIDs)
+        public Task<ServiceResult> CopyDocumentsToFolder([FromQuery]long folderID, string docIDs)
         {
             List<long> docIDList = docIDs.Split(',').Select(long.Parse).ToList();
             DocumentService.CopyDocumentsToFolderAsync(CurrentProject, folderID, docIDList, CurrentUser.Id.Value);
@@ -141,10 +144,10 @@ namespace BIMPlatform.Controllers.Project
         /// 移动文件
         /// </summary>
         /// <param name="folderID"></param>
-        /// <param name="docID"></param>
+        /// <param name="docIDs"></param>
         /// <returns></returns>
         [HttpGet]
-        public Task<ServiceResult> MoveDocumentsToFolder(long folderID, string docIDs)
+        public Task<ServiceResult> MoveDocumentsToFolder([FromQuery]long folderID, string docIDs)
         {
             List<long> docIDList = docIDs.Split(',').Select(long.Parse).ToList();
             DocumentService.MoveDocumentsToFolderAsync(CurrentProject, folderID, docIDList, CurrentUser.Id.Value);

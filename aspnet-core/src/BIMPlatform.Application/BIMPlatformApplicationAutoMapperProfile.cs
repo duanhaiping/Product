@@ -24,10 +24,10 @@ namespace BIMPlatform
             CreateMap<DocumentUploadParams, Document.Document>();
             CreateMap<Document.Document, DocumentDto>();
             CreateMap<DocumentDto, Document.Document>();
-            CreateMap<DocumentFolder, FolderDataInfo>();
+            CreateMap<DocumentFolder, FolderDto>();
             CreateMap<DocumentVersion, Application.Contracts.DocumentDataInfo.Domain.DocumentVersion>();
-            CreateMap<AppUser, UserDataInfo>();
-            CreateMap<UserDataInfo,AppUser >();
+            CreateMap<AppUser, UserDto>();
+            CreateMap<UserDto,AppUser >();
         }
     }
 }

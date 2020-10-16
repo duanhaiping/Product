@@ -14,7 +14,7 @@ namespace BIMPlatform.DocumentService
         long CreateFolder(long? parentFolderID, string folderName);
         bool RenameFolderName(long folderId, string newName);
         bool DeleteFolder(int projectID, Guid userID, long folderID, bool requireRecycle, Guid recycleIdentity);
-        FolderDataInfo GetProjectRootFolder(int projectID);
+        FolderDto GetProjectRootFolder(int projectID);
         List<FolderStructure> GetFolderStructure(long rootFolderID, string suffix, Guid userID , bool getDocCount = false);
     }
 }

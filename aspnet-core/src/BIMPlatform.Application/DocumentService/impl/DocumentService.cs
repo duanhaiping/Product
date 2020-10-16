@@ -639,10 +639,10 @@ namespace BIMPlatform.DocumentService.impl
                 throw new ArgumentException(L["DocumentFolderError:RequireCurrentUserInfo"]);
             }
 
-            UserDataInfo userInfo = new UserDataInfo();
+            UserDto userInfo = new UserDto();
             #region Todo
             AppUser user = UserRepository.FindByKeyValues(CurrentUser.Id.Value);
-            userInfo = ObjectMapper.Map<AppUser, UserDataInfo>(user);
+            userInfo = ObjectMapper.Map<AppUser, UserDto>(user);
             //UserDataInfo userInfo = ApplicationService.Instance.CacheService.GetUserInfo(fileInfo.CreationUserID);
             #endregion
 

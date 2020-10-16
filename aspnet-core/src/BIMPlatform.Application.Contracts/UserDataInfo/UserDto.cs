@@ -9,7 +9,7 @@ namespace BIMPlatform.Application.Contracts.UserDataInfo
     /// 用户
     /// </summary>
     /// 
-    public class UserDataInfo
+    public class UserDto
     {
         public int ID { get; set; }
         /// <summary>

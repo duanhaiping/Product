@@ -127,10 +127,10 @@ namespace BIMPlatform.DocumentService.impl
             return true;
         }
 
-        public FolderDataInfo GetProjectRootFolder(int projectID)
+        public FolderDto GetProjectRootFolder(int projectID)
         {
             DocumentFolder projectRootFolder = GetProjectRootFolder(projectID, Folder.ProjectType);
-            return ObjectMapper.Map<DocumentFolder, FolderDataInfo>(projectRootFolder);
+            return ObjectMapper.Map<DocumentFolder, FolderDto>(projectRootFolder);
         }
 
         private DocumentFolder GetProjectRootFolder(int projectID, string type)

@@ -27,7 +27,7 @@ namespace BIMPlatform.Controllers.Document
         /// <summary>
         /// 创建文件夹
         /// </summary>
-        /// <param name="parentfolderld"></param>
+        /// <param name="folderId"></param>
         /// <param name="name"></param>
         /// <returns></returns>
         [HttpPost]
@@ -93,14 +93,13 @@ namespace BIMPlatform.Controllers.Document
         }
 
         /// <summary>
-        /// 获取当前项目下的文件夹结构 
+        /// 获取当前项目下的文件夹结构
         /// </summary>
-        /// <param name="libraryID"></param>
         /// <returns></returns>
         [HttpGet]
         public async Task<ServiceResult> GetFolderStructure()
         {
-            FolderDataInfo rootFolder = DocumentFolderService.GetProjectRootFolder(this.CurrentProject);
+            FolderDto rootFolder = DocumentFolderService.GetProjectRootFolder(this.CurrentProject);
             if (rootFolder == null)
             {
                 return await ServiceResult<IList<FolderStructure>>.PageList(null, 0, "未找到对应的文件夹信息");

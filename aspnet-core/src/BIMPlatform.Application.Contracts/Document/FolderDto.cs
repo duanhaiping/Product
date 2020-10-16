@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace BIMPlatform.Application.Contracts.DocumentDataInfo
 {
-    public class FolderDataInfo
+    public class FolderDto
     {
         public long ID { get; set; }
         public long ParentFolderID { get; set; }
@@ -15,7 +15,7 @@ namespace BIMPlatform.Application.Contracts.DocumentDataInfo
 
         public List<FolderNamedItem> Directory { get; set; }  //文件或文件夹的目录路径
 
-        public FolderDataInfo()
+        public FolderDto()
         {
             Directory = new List<FolderNamedItem>();
         }

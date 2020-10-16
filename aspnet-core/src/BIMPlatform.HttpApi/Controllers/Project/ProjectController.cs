@@ -26,7 +26,7 @@ namespace BIMPlatform.Controllers.Project
         [HttpGet]
         [Route("{id}")]
         [SwaggerResponse(200, "", typeof(ServiceResult<ProjectDto>))]
-        public async Task<ServiceResult> GetProject(Guid id)
+        public async Task<ServiceResult> GetProject([FromRoute]Guid id)
         {
             var project = await ProjectService.GetProjectAsync(id);
             return await ServiceResult<ProjectDto>.IsSuccess(project);
@@ -45,14 +45,14 @@ namespace BIMPlatform.Controllers.Project
 
         [HttpPost]
 
-        public async Task<ServiceResult> Create(ProjectCreateParams createParams)
+        public async Task<ServiceResult> Create([FromBody]ProjectCreateParams createParams)
         {
             await ProjectService.CreateAsync(createParams);
             return await ServiceResult.IsSuccess();
         }
 
         [HttpPut]
-        public async Task<ServiceResult> Update(ProjectUpdateParams updateParams)
+        public async Task<ServiceResult> Update([FromBody]ProjectUpdateParams updateParams)
         {
             await ProjectService.UpdateAsync(updateParams);
             return await ServiceResult.IsSuccess();
@@ -60,7 +60,7 @@ namespace BIMPlatform.Controllers.Project
 
         [HttpDelete]
         [Route("{id}")]
-        public async Task<ServiceResult> Delete(Guid id)
+        public async Task<ServiceResult> Delete([FromRoute]Guid id)
         {
             
             await ProjectService.DeleteAsync(id);

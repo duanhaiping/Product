@@ -15,7 +15,7 @@ namespace BIMPlatform.Application.Contracts.DocumentDataInfo.Domain
         private string mSize = "0";
         private string statusStr = "";
         //private Document mobjParentDocument = null;
-        private UserDataInfo.UserDataInfo mobjCreationUserInfo;
+        private UserDataInfo.UserDto mobjCreationUserInfo;
 
         //public Document ParentDocument
         //{
@@ -79,7 +79,7 @@ namespace BIMPlatform.Application.Contracts.DocumentDataInfo.Domain
 
         public string StatusStr { get; set; }
 
-        public UserDataInfo.UserDataInfo CreationUserInfo
+        public UserDataInfo.UserDto CreationUserInfo
         {
             get
             {

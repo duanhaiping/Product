@@ -21,7 +21,4 @@
     <ProjectReference Include="..\BIMPlatform.Domain.Shared\BIMPlatform.Domain.Shared.csproj" />
     <ProjectReference Include="..\BIMPlatform.ToolKits\BIMPlatform.ToolKits.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DocumentDataInfo\Dmain\" />
-  </ItemGroup>
 </Project>
