@@ -10,8 +10,8 @@ using Volo.Abp.EntityFrameworkCore;
 namespace BIMPlatform.Migrations
 {
     [DbContext(typeof(BIMPlatformMigrationsDbContext))]
-    [Migration("20200923070413_init")]
-    partial class init
+    [Migration("20201111042317_inital")]
+    partial class inital
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -21,275 +21,11 @@ namespace BIMPlatform.Migrations
                 .HasAnnotation("ProductVersion", "3.1.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("BIMPlatform.Document.Document", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid?>("DeleterId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime?>("DeletionTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<long?>("DocFolderId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("DocNumber")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
-
-                    b.Property<long>("FolderID")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(false);
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid?>("LastModifierId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("varchar(100) CHARACTER SET utf8mb4")
-                        .HasMaxLength(100);
-
-                    b.Property<string>("Properties")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
-
-                    b.Property<Guid>("RecycleIdentity")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
-
-                    b.Property<string>("Suffix")
-                        .HasColumnType("varchar(10) CHARACTER SET utf8mb4")
-                        .HasMaxLength(10);
-
-                    b.Property<Guid?>("TenantId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DocFolderId");
-
-                    b.ToTable("Pro_Document");
-                });
-
-            modelBuilder.Entity("BIMPlatform.Document.DocumentFolder", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("CreationUserID")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid?>("DeleterId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime?>("DeletionTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<long?>("DocFolder2Id")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(false);
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid?>("LastModifierId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
-
-                    b.Property<long?>("ParentFolderID")
-                        .HasColumnType("bigint");
-
-                    b.Property<Guid?>("RecycleIdentity")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
-
-                    b.Property<Guid?>("TenantId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DocFolder2Id");
-
-                    b.ToTable("Pro_DocumentFolder");
-                });
-
-            modelBuilder.Entity("BIMPlatform.Document.DocumentVersion", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("CreationUserID")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid?>("DeleterId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime?>("DeletionTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<long?>("DocFolderId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("DocumentId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("FolderID")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(false);
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid?>("LastModifierId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("MD5")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
-
-                    b.Property<string>("Properties")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
-
-                    b.Property<string>("RemotePath")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
-
-                    b.Property<string>("Size")
-                        .HasColumnType("varchar(50) CHARACTER SET utf8mb4")
-                        .HasMaxLength(50);
-
-                    b.Property<string>("Status")
-                        .HasColumnType("varchar(10) CHARACTER SET utf8mb4")
-                        .HasMaxLength(10);
-
-                    b.Property<string>("Suffix")
-                        .HasColumnType("varchar(10) CHARACTER SET utf8mb4")
-                        .HasMaxLength(10);
-
-                    b.Property<string>("Tags")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
-
-                    b.Property<Guid?>("TenantId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<int>("Version")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DocFolderId");
-
-                    b.HasIndex("DocumentId");
-
-                    b.ToTable("Pro_DocumentVersion");
-                });
-
-            modelBuilder.Entity("BIMPlatform.Document.ProjectRootFolder", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid?>("DeleterId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime?>("DeletionTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<long?>("DocFolderId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("FolderID")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(false);
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid?>("LastModifierId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid?>("ProjectId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid?>("TenantId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Type")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DocFolderId");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("Pro_ProjectRootFolder");
-                });
-
             modelBuilder.Entity("BIMPlatform.Projects.Project", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("int");
 
                     b.Property<string>("Address")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
@@ -368,6 +104,26 @@ namespace BIMPlatform.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Pro_Project");
+                });
+
+            modelBuilder.Entity("BIMPlatform.Projects.ProjectUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProjectId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Pro_ProjectUser");
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLog", b =>
@@ -796,6 +552,10 @@ namespace BIMPlatform.Migrations
                         .HasColumnType("varchar(256) CHARACTER SET utf8mb4")
                         .HasMaxLength(256);
 
+                    b.Property<string>("RoleType")
+                        .HasColumnType("varchar(10) CHARACTER SET utf8mb4")
+                        .HasMaxLength(10);
+
                     b.Property<Guid?>("TenantId")
                         .HasColumnName("TenantId")
                         .HasColumnType("char(36)");
@@ -884,6 +644,10 @@ namespace BIMPlatform.Migrations
                         .HasColumnName("ExtraProperties")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
+                    b.Property<bool>("IsActivated")
+                        .HasColumnType("tinyint(1)")
+                        .HasMaxLength(1);
+
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("IsDeleted")
@@ -960,6 +724,10 @@ namespace BIMPlatform.Migrations
                         .HasColumnName("TwoFactorEnabled")
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(false);
+
+                    b.Property<string>("UserHeadImgUrl")
+                        .HasColumnType("varchar(100) CHARACTER SET utf8mb4")
+                        .HasMaxLength(100);
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -2034,40 +1802,13 @@ namespace BIMPlatform.Migrations
                     b.ToTable("Tnt_TenantConnectionStrings");
                 });
 
-            modelBuilder.Entity("BIMPlatform.Document.Document", b =>
+            modelBuilder.Entity("BIMPlatform.Projects.ProjectUser", b =>
                 {
-                    b.HasOne("BIMPlatform.Document.DocumentFolder", "DocFolder")
-                        .WithMany("Documents")
-                        .HasForeignKey("DocFolderId");
-                });
-
-            modelBuilder.Entity("BIMPlatform.Document.DocumentFolder", b =>
-                {
-                    b.HasOne("BIMPlatform.Document.DocumentFolder", "DocFolder2")
-                        .WithMany("DocFolder1")
-                        .HasForeignKey("DocFolder2Id");
-                });
-
-            modelBuilder.Entity("BIMPlatform.Document.DocumentVersion", b =>
-                {
-                    b.HasOne("BIMPlatform.Document.DocumentFolder", "DocFolder")
-                        .WithMany("DocumentVersions")
-                        .HasForeignKey("DocFolderId");
-
-                    b.HasOne("BIMPlatform.Document.Document", "Document")
-                        .WithMany("DocumentVersions")
-                        .HasForeignKey("DocumentId");
-                });
-
-            modelBuilder.Entity("BIMPlatform.Document.ProjectRootFolder", b =>
-                {
-                    b.HasOne("BIMPlatform.Document.DocumentFolder", "DocFolder")
-                        .WithMany("ProjectRootFolders")
-                        .HasForeignKey("DocFolderId");
-
                     b.HasOne("BIMPlatform.Projects.Project", "Project")
                         .WithMany()
-                        .HasForeignKey("ProjectId");
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLogAction", b =>

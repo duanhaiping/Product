@@ -1,7 +1,6 @@
-﻿using BIMPlatform.Application.Contracts.DocumentDataInfo.Domain;
+﻿using BIMPlatform.Configurations;
+using BIMPlatform.Document;
 using BIMPlatform.SharedResources.Interfaces;
-using Platform.ToolKits.Common;
-using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -32,14 +31,14 @@ namespace BIMPlatform.Application.Contracts.DocumentDataInfo.Util
             if (version != null)
             {
                 #region Todo
-                //DocDomain.DocumentVersion docVersionObj = SimpleObjectMapper.CreateTargetObject<DocumentVersion, DocDomain.DocumentVersion>(version);
+                //DocDomain.DocumentVersion docVersionObj = ObjectMapper.Map<DocumentVersion, DocDomain.DocumentVersion>(version);
                 //docVersionObj.GetSizeDisplayAs(ResourceManager);
                 //UserDataInfo creationUserInfo = ApplicationService.Instance.CacheService.GetUserInfo(version.CreationUserID);
                 //docVersionObj.CreationUser = creationUserInfo.DisplayName;
                 //docVersionObj.StatusStr = DocumentExtenstion.GetStatuDisplay(docVersionObj.Status); 
                 //docVersionObj.DocNumber = string.Empty;// version.Document.DocNumber;
                 //docVersionObj.Suffix = version.Suffix;
-                //versionInfo = SimpleObjectMapper.CreateTargetObject<DocDomain.DocumentVersion, DocumentVersionDto>(docVersionObj);
+                //versionInfo = ObjectMapper.Map<DocDomain.DocumentVersion, DocumentVersionDto>(docVersionObj);
                 //versionInfo.Tags = version.Tags;
                 //versionInfo.RemotePath = GetDocumentFilePath(version);
                 #endregion
@@ -49,7 +48,7 @@ namespace BIMPlatform.Application.Contracts.DocumentDataInfo.Util
 
         private static string GetDocumentFilePath(DocumentVersion docVersionEntity)
         {
-            return Path.Combine(CommonDefine.DocDataFolderPath, docVersionEntity.RemotePath);
+            return Path.Combine(AppSettings.Document.DocDataFolderPath, docVersionEntity.RemotePath);
         }
     }
 }

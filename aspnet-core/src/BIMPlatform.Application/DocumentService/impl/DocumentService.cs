@@ -2,13 +2,13 @@
 using BIMPlatform.Application.Contracts.Entity;
 using BIMPlatform.Application.Contracts.Events;
 using BIMPlatform.Application.Contracts.UserDataInfo;
+using BIMPlatform.Configurations;
 using BIMPlatform.Document;
 using BIMPlatform.Repositories.Document;
 using BIMPlatform.ToolKits.Helper;
 using BIMPlatform.Users;
 using BIMPlatform.Users.Repositories;
 using Microsoft.AspNetCore.Http;
-using Platform.ToolKits.Common;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -17,7 +17,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using Volo.Abp.Data;
-using Volo.Abp.Identity;
 
 namespace BIMPlatform.DocumentService.impl
 {
@@ -29,6 +28,8 @@ namespace BIMPlatform.DocumentService.impl
         private readonly IDocumentVersionRepository DocumentVersionRepository;
         private readonly IDocumentFolderCommonService DocumentFolderCommonService;
         private readonly IUserRepository UserRepository;
+        private readonly IDocumentAssociationService DocAssociationService;
+        private readonly IDocumentPreviewConfigService DocumentPreviewConfigService;
 
         private static object mobjLock = new object();
         private string[] mcolVisibleStatuses = new string[] { "Created", "Released", "OnVerified" };
@@ -59,6 +60,8 @@ namespace BIMPlatform.DocumentService.impl
             IDocumentVersionRepository documentVersionRepository,
             IDocumentFolderCommonService documentFolderCommonService,
             IUserRepository userRepository,
+            IDocumentAssociationService documentAssociationService,
+            IDocumentPreviewConfigService documentPreviewConfigService,
             IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             DataFilter = dataFilter;
@@ -67,6 +70,8 @@ namespace BIMPlatform.DocumentService.impl
             DocumentVersionRepository = documentVersionRepository;
             DocumentFolderCommonService = documentFolderCommonService;
             UserRepository = userRepository;
+            DocAssociationService = documentAssociationService;
+            DocumentPreviewConfigService = documentPreviewConfigService;
         }
 
         #region service
@@ -189,7 +194,7 @@ namespace BIMPlatform.DocumentService.impl
                     }
                     else
                     {
-                        //ServerLogger.Error(string.Format("Cannot get file path for document {0}", version.Name));
+                        //// ServerLogger.Error(string.Format("Cannot get file path for document {0}", version.Name));
                         continue;
                     }
 
@@ -275,7 +280,7 @@ namespace BIMPlatform.DocumentService.impl
                     Status = version.Status
 
                 };
-                string path = Path.Combine(CommonDefine.DocDataFolderPath, version.RemotePath);
+                string path = Path.Combine(AppSettings.Document.DocDataFolderPath, version.RemotePath);
 
                 fileInfo.Stream = File.OpenRead(path);
 
@@ -338,7 +343,7 @@ namespace BIMPlatform.DocumentService.impl
                             Status = docVersion.Status
 
                         };
-                        string path = Path.Combine(CommonDefine.DocDataFolderPath, docVersion.RemotePath);
+                        string path = Path.Combine(AppSettings.Document.DocDataFolderPath, docVersion.RemotePath);
 
                         fileInfo.Stream = File.OpenRead(path);
                         DocumentVersion docVer = UploadFileInternal(fileInfo);
@@ -613,7 +618,7 @@ namespace BIMPlatform.DocumentService.impl
 
         private string GetDocumentFilePath(DocumentVersion docVersionEntity)
         {
-            return Path.Combine(CommonDefine.DocDataFolderPath, docVersionEntity.RemotePath);
+            return Path.Combine(AppSettings.Document.DocDataFolderPath, docVersionEntity.RemotePath);
         }
 
         /// <summary>
@@ -650,7 +655,7 @@ namespace BIMPlatform.DocumentService.impl
 
             Document.Document documentEntity =
                 DocumentRepository.FirstOrDefault(doc => doc.Name == fileInfo.Name && doc.FolderID == targetFolder.Id && doc.Suffix == fileInfo.Suffix && mcolVisibleStatuses.Contains(doc.Status));
-            Application.Contracts.DocumentDataInfo.Domain.Document documentObj = new Application.Contracts.DocumentDataInfo.Domain.Document();
+            DocumentDto documentObj = new DocumentDto();
             documentObj.Name = fileInfo.Name;
             documentObj.Suffix = fileInfo.Suffix.ToLower();
             documentObj.FolderID = targetFolder.Id;
@@ -661,21 +666,21 @@ namespace BIMPlatform.DocumentService.impl
 
             if (documentEntity != null)
             {
-                documentObj = ObjectMapper.Map<Document.Document, Application.Contracts.DocumentDataInfo.Domain.Document>(documentEntity);
+                documentObj = ObjectMapper.Map<Document.Document,DocumentDto>(documentEntity);
                 foreach (DocumentVersion docVersionEntity in documentEntity.DocumentVersions.ToList())
                 {
-                    Application.Contracts.DocumentDataInfo.Domain.DocumentVersion docVersionObj = ObjectMapper.Map<DocumentVersion, Application.Contracts.DocumentDataInfo.Domain.DocumentVersion>(docVersionEntity);
+                   DocumentVersionDto docVersionObj = ObjectMapper.Map<DocumentVersion, DocumentVersionDto>(docVersionEntity);
                     documentObj.Versions.Add(docVersionObj);
                 }
             }
             else
             {
-                documentEntity = ObjectMapper.Map<Application.Contracts.DocumentDataInfo.Domain.Document, Document.Document>(documentObj);
+                documentEntity = ObjectMapper.Map<DocumentDto, Document.Document>(documentObj);
                 DocumentRepository.Add(documentEntity);
             }
 
-            Application.Contracts.DocumentDataInfo.Domain.DocumentVersion nextDocVersionObj = documentObj.CreateNextVersion(targetFolder.Id, fileInfo, userInfo);
-            DocumentVersion nextDocVerionEntity = ObjectMapper.Map<Application.Contracts.DocumentDataInfo.Domain.DocumentVersion, DocumentVersion>(nextDocVersionObj);
+            DocumentVersionDto nextDocVersionObj = documentObj.CreateNextVersion(targetFolder.Id, fileInfo, userInfo);
+            DocumentVersion nextDocVerionEntity = ObjectMapper.Map<DocumentVersionDto, DocumentVersion>(nextDocVersionObj);
             nextDocVerionEntity.Document = documentEntity;
             if (fileInfo.Status == "OnVerified")
             {
@@ -690,13 +695,13 @@ namespace BIMPlatform.DocumentService.impl
                 #endregion
             }
 
-            string parentFolder = Path.Combine(CommonDefine.DocDataFolderPath, nextDocVersionObj.ParentFolderName);
+            string parentFolder = Path.Combine(AppSettings.Document.DocDataFolderPath, nextDocVersionObj.ParentFolderName);
             if (!Directory.Exists(parentFolder))
             {
                 Directory.CreateDirectory(parentFolder);
             }
 
-            string remoteFullPath = Path.Combine(CommonDefine.DocDataFolderPath, nextDocVersionObj.RemotePath);
+            string remoteFullPath = Path.Combine(AppSettings.Document.DocDataFolderPath, nextDocVersionObj.RemotePath);
             try
             {
                 using (FileStream writer = new FileStream(remoteFullPath, FileMode.Create, FileAccess.Write))
@@ -728,7 +733,7 @@ namespace BIMPlatform.DocumentService.impl
             return nextDocVerionEntity;
         }
 
-        private string GetDocNumber(DocumentFileDataInfo fileInfo, Application.Contracts.DocumentDataInfo.Domain.Document documentObj)
+        private string GetDocNumber(DocumentFileDataInfo fileInfo, DocumentDto documentObj)
         {
             string folderName = DocumentFolderRepository.FirstOrDefault(n => n.Id == fileInfo.FolderID).Name;
             DocumentFolder folder = GetParentFolder(fileInfo.FolderID);
@@ -801,7 +806,7 @@ namespace BIMPlatform.DocumentService.impl
 
         private void GetDocFileViewInfo(string fileName, bool encodeFileName, ref string viewFileRelativePath, ref string viewFileFullPath)
         {
-            string docViewRelativeFolder = CommonDefine.DocViewNewSubFolderRelativePath;
+            string docViewRelativeFolder = AppSettings.Document.DocViewNewSubFolderRelativePath;
             string viewFileFolderPath = string.Empty;
             GetDocFileViewInfo(docViewRelativeFolder, fileName, encodeFileName, ref viewFileRelativePath, ref viewFileFolderPath, ref viewFileFullPath);
         }
@@ -872,5 +877,94 @@ namespace BIMPlatform.DocumentService.impl
             base.SubscribeEvent(entityInfo, userID, eventSystemName, type);
         }
 
+        public List<DocumentVersionDto> GetProjectImgDocumentVersions(int projectID)
+        {
+            AssociationEntityDataInfo entityInfo = new AssociationEntityDataInfo() { EntityClassName = "ProjectImg", EntityKey = "ID", EntityValue = projectID.ToString() };
+            List<DocumentVersionDto> docVersions =
+                DocAssociationService.GetAllAssociatedDocumentsByEntity(entityInfo, "Img", true).Select(da => da.AssociatedDocVersion).ToList();
+            return docVersions;
+        }
+
+        public string GetPreviewFileRelativePath(DocumentVersionDto docVersion)
+        {
+            try
+            {
+                if (!SupportPreviewDocument)
+                {
+                    throw new NotSupportedException("Preview is not supported.");
+                }
+
+                DocumentPreviewConfigItem previewConfig = DocumentPreviewConfigService.GetPreviewConfigBySuffix(docVersion.Suffix);
+                if (previewConfig == null)
+                {
+                    return string.Empty;
+                }
+                else
+                {
+                    string docName = docVersion.Name;
+                    string sourceFile = docVersion.RemotePath;
+                    if (!File.Exists(sourceFile))
+                    {
+                        sourceFile = Path.Combine(AppSettings.Document.DocDataFolderPath, docVersion.RemotePath);
+                    }
+
+                    // Need to be transformed, otherwise, can be previewed directly
+                    if (!string.IsNullOrEmpty(previewConfig.TransformHandler))
+                    {
+                        AssociationEntityDataInfo fromEntity = new AssociationEntityDataInfo() { EntityClassName = "DocumentVersion", EntityKey = "ID", EntityValue = docVersion.ID.ToString() };
+
+                        IList<DocumentAssociationDataInfo> transformedDocs = DocAssociationService.GetAllAssociatedDocumentsByEntity(fromEntity, "DocTransform");
+                        if (transformedDocs.Count > 0)
+                        {
+                            sourceFile = transformedDocs[0].AssociatedDocVersion.RemotePath;
+                            docName = transformedDocs[0].AssociatedDocVersion.Name;
+                        }
+                        else
+                        {
+                            return string.Empty;
+                        }
+                    }
+
+                    string viewFileRelativePath = string.Empty;
+                    string viewFileFullPath = string.Empty;
+
+                    string viewFileExt = Path.GetExtension(docName);
+                    bool encodeName = false;
+                    // Pdf and json file's url will be passed back to website so has to encode it.
+                    if (string.Compare(viewFileExt, ".pdf", true) == 0 || string.Compare(viewFileExt, ".json", true) == 0)
+                    {
+                        encodeName = true;
+                    }
+
+                    GetDocFileViewInfo(docName, encodeName, ref viewFileRelativePath, ref viewFileFullPath);
+
+                    File.Copy(sourceFile, viewFileFullPath);
+                    if (File.Exists(viewFileFullPath))
+                    {
+                        if (!viewFileRelativePath.StartsWith("/"))
+                        {
+                            viewFileRelativePath = "/" + viewFileRelativePath;
+                        }
+                        return viewFileRelativePath;
+                    }
+                    else
+                    {
+                        return string.Empty;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                
+                return string.Empty;
+            }
+        }
+
+        public DocumentVersionDto GetProjectCoverImgDocumentVersions(int projectID)
+        {
+            AssociationEntityDataInfo entityInfo = new AssociationEntityDataInfo() { EntityClassName = "ProjectCoverImg", EntityKey = "ID", EntityValue = projectID.ToString() };
+            DocumentVersionDto docVersion = DocAssociationService.GetAllAssociatedDocumentsByEntity(entityInfo, "Img", true).Select(da => da.AssociatedDocVersion).FirstOrDefault();
+            return docVersion;
+        }
     }
 }

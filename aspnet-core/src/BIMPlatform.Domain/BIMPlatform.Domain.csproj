@@ -13,9 +13,35 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Document\**" />
+    <Compile Remove="Entity\**" />
+    <Compile Remove="Group\**" />
+    <EmbeddedResource Remove="Document\**" />
+    <EmbeddedResource Remove="Entity\**" />
+    <EmbeddedResource Remove="Group\**" />
+    <None Remove="Document\**" />
+    <None Remove="Entity\**" />
+    <None Remove="Group\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="AccessControl.cs" />
+    <Compile Remove="Activity.cs" />
+    <Compile Remove="ActivityHistory.cs" />
     <Compile Remove="BIMPlatformConsts.cs" />
+    <Compile Remove="Data\ProjectDataSeeder.cs" />
+    <Compile Remove="Data\ProjectDataSeederContributor.cs" />
+    <Compile Remove="Projects\ProjectGroup.cs" />
+    <Compile Remove="Projects\ProjectUserRole.cs" />
+    <Compile Remove="Projects\Repositories\IProjectGroupRepository.cs" />
+    <Compile Remove="Projects\Repositories\IProjectUserRoleRepository.cs" />
+    <Compile Remove="Projects\Repositories\IUserInProjectRepository.cs" />
+    <Compile Remove="Projects\UserInProject.cs" />
     <Compile Remove="Settings\BIMPlatformSettings.cs" />
     <Compile Remove="Users\BIMPlatformAdministratorUserDataSeederContributor.cs" />
+    <Compile Remove="Users\Repositories\IUserInGroupRepository.cs" />
+    <Compile Remove="Users\Repositories\IUserPreferenceRepository.cs" />
+    <Compile Remove="Users\UserPreference.cs" />
   </ItemGroup>
 
   <ItemGroup>

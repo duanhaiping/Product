@@ -11,7 +11,7 @@ namespace BIMPlatform.BackgroundJobs
         {
             var job = service.GetService<HangfireTestJob>();
 
-            RecurringJob.AddOrUpdate("定时任务测试", () => job.ExecuteAsync(), CronType.Second());
+           // RecurringJob.AddOrUpdate("定时任务测试", () => job.ExecuteAsync(), CronType.Second());
         }
     }
 }

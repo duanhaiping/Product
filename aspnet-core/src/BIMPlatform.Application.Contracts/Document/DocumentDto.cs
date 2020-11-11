@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Volo.Abp.Application.Dtos;
 
@@ -8,6 +9,8 @@ namespace BIMPlatform.Application.Contracts.DocumentDataInfo
 {
     public class DocumentDto : AuditedEntityDto<Guid>
     {
+        public string DocNumber;
+
         /// <summary>
         /// The ID of the current upload session for multiple files, optional
         /// assigned value for form + document
@@ -81,5 +84,84 @@ namespace BIMPlatform.Application.Contracts.DocumentDataInfo
         public string VerifiedPermissionName { get; set; }
 
         public string Description { get; set; }
+        public List<DocumentVersionDto> Versions { get; set; }
+
+
+        private List<AtuoNumberKeyVaribale> ProvideKeyVariable { get; set; }
+        public DocumentVersionDto GetLatestVersion()
+        {
+            return Versions.OrderByDescending(ver => ver.Version).FirstOrDefault();
+        }
+        public DocumentVersionDto CreateNextVersion(long targetFolderID, DocumentFileDataInfo fileInfo, UserDataInfo.UserDto creationUserInfo)
+        {
+            DocumentVersionDto currentVersion = GetLatestVersion();
+            DocumentVersionDto nextVersion = new DocumentVersionDto();
+            //nextVersion.ParentDocument = this;
+            if (currentVersion != null)
+            {
+                nextVersion.Version = currentVersion.Version + 1;
+            }
+            else
+            {
+                nextVersion.Version = 1;
+            }
+
+            nextVersion.FolderID = targetFolderID;
+            nextVersion.Name = fileInfo.Name;
+            nextVersion.Suffix = fileInfo.Suffix;
+            //nextVersion.MD5 = GetFileMD5.GetMD5HashFromFile(fileInfo.Stream);
+            //nextVersion.FileLength = fileInfo.Stream.Length;
+            nextVersion.Properties = XmlOption.GetXmlProperty(fileInfo.CustomizedProperties);
+            nextVersion.CreationUserInfo = creationUserInfo;
+            nextVersion.CreationDate = DateTime.Now;
+            nextVersion.ParentFolderName = DateTime.Now.ToString("yyyy_M_d");
+            nextVersion.RemotePath = Path.Combine(nextVersion.ParentFolderName, Guid.NewGuid().ToString());
+            nextVersion.Status = string.IsNullOrEmpty(fileInfo.Status) ? "Created" : fileInfo.Status;
+
+            return nextVersion;
+        }
+        public string GetAutoId(string result)
+        {
+            foreach (var variable in ProvideKeyVariable)
+            {
+                result = result.Replace(variable.Key, variable.KeyValue);
+            }
+            return result;
+        }
+        public class AtuoNumberKeyVaribale
+        {
+            public string KeyName { get; set; }
+            public string Key { get; set; }
+            public string KeyValue { get; set; }
+            public bool IsSystem { get; set; }
+        }
+        public static class KeyValue
+        {
+            public static string ProjectName = "{Project}";
+            public static string Sequence = "{Sequence}";
+            public static string Folder = "{Folder}";
+        }
+        public static class KeyValueName
+        {
+            public static string ProjectName = "Project";
+            public static string Sequence = "Sequence";
+            public static string Folder = "Folder";
+        }
+        public void SetDefaultProvideKeyVariableValue(string projectName, string folderName, int? maxNumber)
+        {
+            foreach (var item in ProvideKeyVariable)
+            {
+                if (item.Key == KeyValue.ProjectName)
+                    item.KeyValue = projectName;
+                if (maxNumber != null)
+                {
+                    if (item.Key == KeyValue.Sequence)
+                        item.KeyValue = (maxNumber + 1).ToString().PadLeft(3, '0');
+                }
+
+                if (item.Key == KeyValue.Folder)
+                    item.KeyValue = folderName;
+            }
+        }
     }
 }

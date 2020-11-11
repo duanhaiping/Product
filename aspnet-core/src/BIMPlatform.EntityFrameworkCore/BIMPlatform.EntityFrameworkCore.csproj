@@ -8,6 +8,19 @@
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
     <RunAnalyzersDuringLiveAnalysis>false</RunAnalyzersDuringLiveAnalysis>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Identity\**" />
+    <Compile Remove="Repositories\Document\**" />
+    <EmbeddedResource Remove="Identity\**" />
+    <EmbeddedResource Remove="Repositories\Document\**" />
+    <None Remove="Identity\**" />
+    <None Remove="Repositories\Document\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Repositories\Project\UserInProjectRepository.cs" />
+  </ItemGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\BIMPlatform.Domain\BIMPlatform.Domain.csproj" />

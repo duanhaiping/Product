@@ -12,8 +12,6 @@ namespace BIMPlatform.Configurations
         /// </summary>
         private static readonly IConfigurationRoot _config;
 
-        private const string Prefix = "BIMPlatform";
-
         /// <summary>
         /// Constructor
         /// </summary>
@@ -38,7 +36,7 @@ namespace BIMPlatform.Configurations
         public static string ApiVersion => _config["ApiVersion"];
 
         /// <summary>
-        /// JWT
+        /// Hangfire
         /// </summary>
 
         public static class Hangfire
@@ -56,6 +54,12 @@ namespace BIMPlatform.Configurations
             public static int MaxSize =>int.Parse( _config["ALiYun:OSS:MaxSize"]);
             public static string Callback => _config["ALiYun:OSS:Callback"];
             public static string DirPrefix => _config["ALiYun:OSS:Dir:Prefix"];
+        }
+
+        public static class Document 
+        {
+            public static string DocDataFolderPath =Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _config["Document:Folder:DocData"]) ;
+            public static string DocViewNewSubFolderRelativePath = Path.Combine(_config["Document:Folder:DocRootViewDirName"], Guid.NewGuid().ToString());
         }
     }
 }

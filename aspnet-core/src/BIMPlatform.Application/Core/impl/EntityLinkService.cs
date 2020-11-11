@@ -13,7 +13,7 @@ namespace BIMPlatform.Core.impl
 
         //public IList<object> GetMasterLinkEntities(EntityDataInfo entityInfo, string linkType = "")
         //{
-        //    ServerLogger.Info(string.Format("Get master link entities by sub entity from {0} by {1}-{2}", entityInfo.EntityClassName, entityInfo.EntityKey, entityInfo.EntityValue));
+        //   // // ServerLogger.Info(string.Format("Get master link entities by sub entity from {0} by {1}-{2}", entityInfo.EntityClassName, entityInfo.EntityKey, entityInfo.EntityValue));
         //    Stopwatch watch = new Stopwatch();
         //    watch.Start();
 
@@ -26,14 +26,14 @@ namespace BIMPlatform.Core.impl
         //    finally
         //    {
         //        watch.Stop();
-        //        ServerLogger.Perfomance(watch, "Get master link entities");
-        //        ServerLogger.Info("End to get master link entities");
+        //        // ServerLogger.Perfomance(watch, "Get master link entities");
+        //       // // ServerLogger.Info("End to get master link entities");
         //    }
         //}
 
         //public IList<object> GetSubLinkEntities(EntityDataInfo entityInfo, string linkType = "")
         //{
-        //    ServerLogger.Info(string.Format("Get sub link entities by master entity from {0} by {1}-{2}", entityInfo.EntityClassName, entityInfo.EntityKey, entityInfo.EntityValue));
+        //   // // ServerLogger.Info(string.Format("Get sub link entities by master entity from {0} by {1}-{2}", entityInfo.EntityClassName, entityInfo.EntityKey, entityInfo.EntityValue));
         //    Stopwatch watch = new Stopwatch();
         //    watch.Start();
 
@@ -47,8 +47,8 @@ namespace BIMPlatform.Core.impl
         //    finally
         //    {
         //        watch.Stop();
-        //        ServerLogger.Perfomance(watch, "Get sub link entities");
-        //        ServerLogger.Info("End to get sub link entities");
+        //        // ServerLogger.Perfomance(watch, "Get sub link entities");
+        //       // // ServerLogger.Info("End to get sub link entities");
         //    }
         //}
 
@@ -96,7 +96,7 @@ namespace BIMPlatform.Core.impl
         //            string.IsNullOrEmpty(fromEntityInfo.EntityValue))
         //            throw new ArgumentException("Entity misses values");
 
-        //        ServerLogger.Info(string.Format("Start to link entities to entity {0}-{1}-{2} with type {3}", fromEntityInfo.EntityClassName, fromEntityInfo.EntityKey, fromEntityInfo.EntityValue, type));
+        //       // // ServerLogger.Info(string.Format("Start to link entities to entity {0}-{1}-{2} with type {3}", fromEntityInfo.EntityClassName, fromEntityInfo.EntityKey, fromEntityInfo.EntityValue, type));
 
         //        bool addRel = false;
         //        foreach (AssociationEntityDataInfo subEntity in toEntityInfos)
@@ -131,8 +131,8 @@ namespace BIMPlatform.Core.impl
         //    finally
         //    {
         //        watch.Stop();
-        //        ServerLogger.Perfomance(watch, "Link entities");
-        //        ServerLogger.Info("End to link entity");
+        //        // ServerLogger.Perfomance(watch, "Link entities");
+        //       // // ServerLogger.Info("End to link entity");
         //    }
         //}
 

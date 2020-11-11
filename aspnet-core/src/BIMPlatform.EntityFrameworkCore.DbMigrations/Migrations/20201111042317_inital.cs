@@ -4,48 +4,16 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BIMPlatform.Migrations
 {
-    public partial class init : Migration
+    public partial class inital : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Pro_DocumentFolder",
-                columns: table => new
-                {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    ParentFolderID = table.Column<long>(nullable: true),
-                    Name = table.Column<string>(nullable: true),
-                    CreationUserID = table.Column<int>(nullable: false),
-                    CreationDate = table.Column<DateTime>(nullable: false),
-                    Status = table.Column<string>(nullable: true),
-                    RecycleIdentity = table.Column<Guid>(nullable: true),
-                    CreationTime = table.Column<DateTime>(nullable: false),
-                    CreatorId = table.Column<Guid>(nullable: true),
-                    LastModifierId = table.Column<Guid>(nullable: true),
-                    LastModificationTime = table.Column<DateTime>(nullable: true),
-                    IsDeleted = table.Column<bool>(nullable: false, defaultValue: false),
-                    DeleterId = table.Column<Guid>(nullable: true),
-                    DeletionTime = table.Column<DateTime>(nullable: true),
-                    TenantId = table.Column<Guid>(nullable: true),
-                    DocFolder2Id = table.Column<long>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Pro_DocumentFolder", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Pro_DocumentFolder_Pro_DocumentFolder_DocFolder2Id",
-                        column: x => x.DocFolder2Id,
-                        principalTable: "Pro_DocumentFolder",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Pro_Project",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(maxLength: 100, nullable: false),
                     Description = table.Column<string>(maxLength: 200, nullable: true),
                     StartDate = table.Column<DateTime>(nullable: false),
@@ -339,7 +307,8 @@ namespace BIMPlatform.Migrations
                     NormalizedName = table.Column<string>(maxLength: 256, nullable: false),
                     IsDefault = table.Column<bool>(nullable: false),
                     IsStatic = table.Column<bool>(nullable: false),
-                    IsPublic = table.Column<bool>(nullable: false)
+                    IsPublic = table.Column<bool>(nullable: false),
+                    RoleType = table.Column<string>(maxLength: 10, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -390,7 +359,9 @@ namespace BIMPlatform.Migrations
                     TwoFactorEnabled = table.Column<bool>(nullable: false, defaultValue: false),
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false, defaultValue: false),
-                    AccessFailedCount = table.Column<int>(nullable: false, defaultValue: 0)
+                    AccessFailedCount = table.Column<int>(nullable: false, defaultValue: 0),
+                    IsActivated = table.Column<bool>(maxLength: 1, nullable: false),
+                    UserHeadImgUrl = table.Column<string>(maxLength: 100, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -451,73 +422,23 @@ namespace BIMPlatform.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Pro_Document",
+                name: "Pro_ProjectUser",
                 columns: table => new
                 {
-                    Id = table.Column<long>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    FolderID = table.Column<long>(nullable: false),
-                    Name = table.Column<string>(maxLength: 100, nullable: true),
-                    DocNumber = table.Column<string>(nullable: true),
-                    Suffix = table.Column<string>(maxLength: 10, nullable: true),
-                    Properties = table.Column<string>(nullable: true),
-                    Status = table.Column<string>(nullable: true),
-                    RecycleIdentity = table.Column<Guid>(nullable: false),
-                    CreationTime = table.Column<DateTime>(nullable: false),
-                    CreatorId = table.Column<Guid>(nullable: true),
-                    LastModifierId = table.Column<Guid>(nullable: true),
-                    LastModificationTime = table.Column<DateTime>(nullable: true),
-                    IsDeleted = table.Column<bool>(nullable: false, defaultValue: false),
-                    DeleterId = table.Column<Guid>(nullable: true),
-                    DeletionTime = table.Column<DateTime>(nullable: true),
-                    TenantId = table.Column<Guid>(nullable: true),
-                    DocFolderId = table.Column<long>(nullable: true)
+                    ProjectId = table.Column<int>(nullable: false),
+                    UserId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Pro_Document", x => x.Id);
+                    table.PrimaryKey("PK_Pro_ProjectUser", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Pro_Document_Pro_DocumentFolder_DocFolderId",
-                        column: x => x.DocFolderId,
-                        principalTable: "Pro_DocumentFolder",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Pro_ProjectRootFolder",
-                columns: table => new
-                {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    FolderID = table.Column<long>(nullable: false),
-                    Type = table.Column<string>(nullable: true),
-                    CreationTime = table.Column<DateTime>(nullable: false),
-                    CreatorId = table.Column<Guid>(nullable: true),
-                    LastModifierId = table.Column<Guid>(nullable: true),
-                    LastModificationTime = table.Column<DateTime>(nullable: true),
-                    IsDeleted = table.Column<bool>(nullable: false, defaultValue: false),
-                    DeleterId = table.Column<Guid>(nullable: true),
-                    DeletionTime = table.Column<DateTime>(nullable: true),
-                    TenantId = table.Column<Guid>(nullable: true),
-                    DocFolderId = table.Column<long>(nullable: true),
-                    ProjectId = table.Column<Guid>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Pro_ProjectRootFolder", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Pro_ProjectRootFolder_Pro_DocumentFolder_DocFolderId",
-                        column: x => x.DocFolderId,
-                        principalTable: "Pro_DocumentFolder",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Pro_ProjectRootFolder_Pro_Project_ProjectId",
+                        name: "FK_Pro_ProjectUser_Pro_Project_ProjectId",
                         column: x => x.ProjectId,
                         principalTable: "Pro_Project",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1000,52 +921,6 @@ namespace BIMPlatform.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Pro_DocumentVersion",
-                columns: table => new
-                {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    FolderID = table.Column<long>(nullable: false),
-                    Version = table.Column<int>(nullable: false),
-                    Name = table.Column<string>(nullable: true),
-                    Suffix = table.Column<string>(maxLength: 10, nullable: true),
-                    MD5 = table.Column<string>(nullable: true),
-                    Size = table.Column<string>(maxLength: 50, nullable: true),
-                    RemotePath = table.Column<string>(nullable: true),
-                    Status = table.Column<string>(maxLength: 10, nullable: true),
-                    CreationUserID = table.Column<int>(nullable: false),
-                    CreationDate = table.Column<DateTime>(nullable: false),
-                    Properties = table.Column<string>(nullable: true),
-                    Tags = table.Column<string>(nullable: true),
-                    CreationTime = table.Column<DateTime>(nullable: false),
-                    CreatorId = table.Column<Guid>(nullable: true),
-                    LastModifierId = table.Column<Guid>(nullable: true),
-                    LastModificationTime = table.Column<DateTime>(nullable: true),
-                    IsDeleted = table.Column<bool>(nullable: false, defaultValue: false),
-                    DeleterId = table.Column<Guid>(nullable: true),
-                    DeletionTime = table.Column<DateTime>(nullable: true),
-                    TenantId = table.Column<Guid>(nullable: true),
-                    DocFolderId = table.Column<long>(nullable: true),
-                    DocumentId = table.Column<long>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Pro_DocumentVersion", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Pro_DocumentVersion_Pro_DocumentFolder_DocFolderId",
-                        column: x => x.DocFolderId,
-                        principalTable: "Pro_DocumentFolder",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Pro_DocumentVersion_Pro_Document_DocumentId",
-                        column: x => x.DocumentId,
-                        principalTable: "Pro_Document",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Sys_ApiScopeClaims",
                 columns: table => new
                 {
@@ -1088,33 +963,8 @@ namespace BIMPlatform.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Pro_Document_DocFolderId",
-                table: "Pro_Document",
-                column: "DocFolderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Pro_DocumentFolder_DocFolder2Id",
-                table: "Pro_DocumentFolder",
-                column: "DocFolder2Id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Pro_DocumentVersion_DocFolderId",
-                table: "Pro_DocumentVersion",
-                column: "DocFolderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Pro_DocumentVersion_DocumentId",
-                table: "Pro_DocumentVersion",
-                column: "DocumentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Pro_ProjectRootFolder_DocFolderId",
-                table: "Pro_ProjectRootFolder",
-                column: "DocFolderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Pro_ProjectRootFolder_ProjectId",
-                table: "Pro_ProjectRootFolder",
+                name: "IX_Pro_ProjectUser_ProjectId",
+                table: "Pro_ProjectUser",
                 column: "ProjectId");
 
             migrationBuilder.CreateIndex(
@@ -1278,10 +1128,7 @@ namespace BIMPlatform.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Pro_DocumentVersion");
-
-            migrationBuilder.DropTable(
-                name: "Pro_ProjectRootFolder");
+                name: "Pro_ProjectUser");
 
             migrationBuilder.DropTable(
                 name: "Sys_ApiClaims");
@@ -1374,9 +1221,6 @@ namespace BIMPlatform.Migrations
                 name: "Tnt_TenantConnectionStrings");
 
             migrationBuilder.DropTable(
-                name: "Pro_Document");
-
-            migrationBuilder.DropTable(
                 name: "Pro_Project");
 
             migrationBuilder.DropTable(
@@ -1402,9 +1246,6 @@ namespace BIMPlatform.Migrations
 
             migrationBuilder.DropTable(
                 name: "Tnt_Tenants");
-
-            migrationBuilder.DropTable(
-                name: "Pro_DocumentFolder");
 
             migrationBuilder.DropTable(
                 name: "Sys_ApiResources");

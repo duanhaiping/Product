@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Volo.Abp;
 using Volo.Abp.Auditing;
 using Volo.Abp.Domain.Entities;
@@ -26,6 +27,8 @@ namespace BIMPlatform.Document
         public DateTime? DeletionTime { get; set; }
         public Guid? TenantId { get; set; }
 
+        [ForeignKey("DocFolderID")]
+        public DocumentFolder DocFolder { get; set; }
         public ICollection<Document> Documents { get; set; }
         public ICollection<DocumentVersion> DocumentVersions { get; set; }
         public ICollection<DocumentFolder> DocFolder1 { get; set; }

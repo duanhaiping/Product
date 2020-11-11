@@ -11,7 +11,7 @@ namespace BIMPlatform.Application.Contracts.UserDataInfo
     /// 
     public class UserDto
     {
-        public int ID { get; set; }
+        public Guid ID { get; set; }
         /// <summary>
         /// 用户名称
         /// </summary>

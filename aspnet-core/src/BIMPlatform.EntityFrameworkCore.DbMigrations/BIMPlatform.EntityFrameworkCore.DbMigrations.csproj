@@ -76,6 +76,18 @@
     <Compile Remove="Migrations\20200917021908_init.Designer.cs" />
     <Compile Remove="Migrations\20200918080827_init.cs" />
     <Compile Remove="Migrations\20200918080827_init.Designer.cs" />
+    <Compile Remove="Migrations\20201104084223_init2.cs" />
+    <Compile Remove="Migrations\20201104084223_init2.Designer.cs" />
+    <Compile Remove="Migrations\20201109091426_UpdateAppUserAddColumn.cs" />
+    <Compile Remove="Migrations\20201109091426_UpdateAppUserAddColumn.Designer.cs" />
+    <Compile Remove="Migrations\20201109091630_UpdateAppUserAddColumn.cs" />
+    <Compile Remove="Migrations\20201109091630_UpdateAppUserAddColumn.Designer.cs" />
+    <Compile Remove="Migrations\20201111033210_update.cs" />
+    <Compile Remove="Migrations\20201111033210_update.Designer.cs" />
+    <Compile Remove="Migrations\20201111033906_update.cs" />
+    <Compile Remove="Migrations\20201111033906_update.Designer.cs" />
+    <Compile Remove="Migrations\20201111034615_inital.cs" />
+    <Compile Remove="Migrations\20201111034615_inital.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

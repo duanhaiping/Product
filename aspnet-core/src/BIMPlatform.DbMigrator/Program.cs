@@ -25,6 +25,12 @@ namespace BIMPlatform.DbMigrator
                 .WriteTo.File(Path.Combine(Directory.GetCurrentDirectory(), "Logs/logs.txt"))
                 .WriteTo.Console()
                 .CreateLogger();
+            SetDbTablePrefix();
+            await CreateHostBuilder(args).RunConsoleAsync();
+        }
+
+        private static void SetDbTablePrefix()
+        {
             Volo.Abp.PermissionManagement.AbpPermissionManagementDbProperties.DbTablePrefix = "Sys_";
             Volo.Abp.SettingManagement.AbpSettingManagementDbProperties.DbTablePrefix = "Sys_";
             Volo.Abp.Identity.AbpIdentityDbProperties.DbTablePrefix = "Sys_";
@@ -34,7 +40,6 @@ namespace BIMPlatform.DbMigrator
             Volo.Abp.FeatureManagement.FeatureManagementDbProperties.DbTablePrefix = "Sys_";
             Volo.Abp.BackgroundJobs.BackgroundJobsDbProperties.DbTablePrefix = "Sys_";
             Volo.Abp.AuditLogging.AbpAuditLoggingDbProperties.DbTablePrefix = "SysLog_";
-            await CreateHostBuilder(args).RunConsoleAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

@@ -1,4 +1,5 @@
-﻿using Volo.Abp.Identity;
+﻿using BIMPlatform.Users;
+using Volo.Abp.Identity;
 using Volo.Abp.ObjectExtending;
 using Volo.Abp.Threading;
 
@@ -31,6 +32,17 @@ namespace BIMPlatform.EntityFrameworkCore
                  * See the documentation for more:
                  * https://docs.abp.io/en/abp/latest/Customizing-Application-Modules-Extending-Entities
                  */
+                ObjectExtensionManager.Instance
+                .MapEfCoreProperty<IdentityUser, bool>(
+                    nameof(AppUser.IsActivated),
+                    b => { b.HasMaxLength(1); }
+                )
+                .MapEfCoreProperty<IdentityUser, string>(
+                    nameof(AppUser.UserHeadImgUrl),
+                    b => { b.HasMaxLength(100); }
+             );
+                ObjectExtensionManager.Instance
+                .MapEfCoreProperty<IdentityRole, string>("RoleType", b => b.HasMaxLength(10));
             });
         }
     }

@@ -31,7 +31,7 @@ namespace BIMPlatform.Controllers.Document
         /// <param name="name"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ServiceResult> AddFolder([FromQuery] long folderId, string name)
+        public async Task<ServiceResult> AddFolder( long folderId, string name)
         {
             long result = DocumentFolderService.CreateFolder(folderId, name);
 
@@ -74,7 +74,7 @@ namespace BIMPlatform.Controllers.Document
         /// <param name="name"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ServiceResult> RenameFolderName([FromQuery] long folderID, string name)
+        public async Task<ServiceResult> RenameFolderName([FromBody] long folderID, string name)
         {
             bool result = DocumentFolderService.RenameFolderName(folderID, name);
             return await ServiceResult.IsSuccess("修改成功");
@@ -86,7 +86,7 @@ namespace BIMPlatform.Controllers.Document
         /// <param name="folderID"></param>
         /// <returns></returns>
         [HttpDelete]
-        public async Task<ServiceResult> RemoveFolder([FromQuery] long folderID)
+        public async Task<ServiceResult> RemoveFolder([FromRoute] long folderID)
         {
             bool result = DocumentFolderService.DeleteFolder(CurrentProject, CurrentUser.Id.Value, folderID, true, Guid.NewGuid());
             return await ServiceResult.IsSuccess("删除成功");

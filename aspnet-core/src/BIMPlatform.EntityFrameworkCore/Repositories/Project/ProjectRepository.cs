@@ -6,7 +6,7 @@ using Volo.Abp.EntityFrameworkCore;
 
 namespace BIMPlatform.Repositories.Project
 {
-    public class ProjectRepository : BaseRepository<Projects.Project, Guid>, IProjectRepository
+    public class ProjectRepository : BaseRepository<Projects.Project, int>, IProjectRepository
     {
         public ProjectRepository(IDbContextProvider<BIMPlatformDbContext> dbContextProvider) : base(dbContextProvider)
         {

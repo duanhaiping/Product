@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace BIMPlatform.ProjectDataInfo
+namespace BIMPlatform.Application.Contracts.ProjectDto
 {
     /*
      * 兼容ASP.NET Core模型验证系统
@@ -24,6 +24,7 @@ namespace BIMPlatform.ProjectDataInfo
         /// </summary>
         [Required]
         [StringLength(50)]
+        
         public string Name { get; set; }
         /// <summary>
         /// 描述

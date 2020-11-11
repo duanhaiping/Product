@@ -26,7 +26,6 @@ using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
 using BIMPlatform.EntityFrameworkCore;
 using BIMPlatform.BackgroundJobs;
-using BIMPlatform.Swagger;
 using Microsoft.AspNetCore.Mvc;
 using BIMPlatform.Filters;
 using Volo.Abp.AspNetCore.Mvc.ExceptionHandling;
@@ -34,6 +33,7 @@ using BIMPlatform.Middleware;
 using BIMPlatform.MultiTenancy;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.AspNetCore.Mvc.UI.MultiTenancy;
+using BIMPlatform.Swagger;
 
 namespace BIMPlatform
 {
@@ -46,10 +46,10 @@ namespace BIMPlatform
         typeof(AbpAccountWebIdentityServerModule),
         typeof(AbpAspNetCoreSerilogModule),
         typeof(BIMPlatformHttpApiModule),
-         typeof(BIMPlatformApplicationModule),
+        typeof(BIMPlatformApplicationModule),
         typeof(BIMPlatformEntityFrameworkCoreDbMigrationsModule),
         typeof(AbpAspNetCoreMvcUiMultiTenancyModule),
-         typeof(BIMPlatformSwaggerModule),
+        typeof(BIMPlatformSwaggerModule),
         typeof(BIMPlatformBackgroundJobsModule)
         )]
     public class BIMPlatformHttpApiHostModule : AbpModule
@@ -229,6 +229,8 @@ namespace BIMPlatform
             app.UseAbpRequestLocalization();
             app.UseIdentityServer();
             app.UseAuthorization();
+            //app.UseSwagger();
+            //app.UseSwaggerUI(options => { options.SwaggerEndpoint("/swagger/v1/swagger.json", "BIMPlatform API"); });
 
             app.UseAuditing();
             app.UseAbpSerilogEnrichers();

@@ -1,18 +1,4 @@
-﻿using BIMPlatform.Application.Contracts.Common;
-using BIMPlatform.Application.Contracts.DocumentDataInfo;
-using BIMPlatform.SharedResources.Interfaces;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Web;
-
-namespace BIMPlatform.Application.Contracts.DocumentDataInfo.Util
+﻿namespace BIMPlatform.Application.Contracts.DocumentDataInfo.Util
 {
     public class FileUploader
     {
@@ -222,7 +208,7 @@ namespace BIMPlatform.Application.Contracts.DocumentDataInfo.Util
         //            }
         //            catch(Exception ex)
         //            {
-        //                ServerLogger.Error(string.Format("Failed to delete temp file {0}", file.Name), ex);
+        //                // ServerLogger.Error(string.Format("Failed to delete temp file {0}", file.Name), ex);
         //            }
         //        }
         //    }

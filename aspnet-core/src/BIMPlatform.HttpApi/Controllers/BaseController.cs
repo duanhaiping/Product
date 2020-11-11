@@ -9,10 +9,10 @@ namespace BIMPlatform.Controllers
      */
     [ApiController]
     [Route("api/[controller]/[action]")]
+    [ApiExplorerSettings(GroupName = ApiGrouping.GroupName_v999)]
     [Authorize]
     public abstract class BaseController : AbpController
     {
-        public int CurrentProject { get; set; }
         //public int CurrentUser { get; set; }
     }
 }

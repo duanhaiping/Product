@@ -23,14 +23,14 @@ namespace BIMPlatform.Application.Contracts.DocumentDataInfo
         public bool IsProjectRootFolder { get; set; }
         public bool IsProjectSharedFolder { get; set; }
 
-        public List<Domain.Document> Documents { get; set; }
+        public List<DocumentDto> Documents { get; set; }
 
         public Folder()
         {
-            Documents = new List<Domain.Document>();
+            Documents = new List<DocumentDto>();
         }
 
-        public Domain.Document GetDocumentByName(string name)
+        public DocumentDto GetDocumentByName(string name)
         {
             if (Documents != null && Documents.Count > 0)
                 return Documents.FirstOrDefault(doc => string.Compare(doc.Name, name, true) == 0);
@@ -40,7 +40,7 @@ namespace BIMPlatform.Application.Contracts.DocumentDataInfo
 
         public bool HasDuplicateDocument(string name)
         {
-            Domain.Document doc = GetDocumentByName(name);
+            DocumentDto doc = GetDocumentByName(name);
             return doc != null;
         }
 

@@ -1,12 +1,7 @@
-﻿using BIMPlatform.Application.Contracts;
-using BIMPlatform.Application.Contracts.DocumentDataInfo;
-using BIMPlatform.Application.Contracts.ProjectDataInfo;
+﻿using BIMPlatform.Application.Contracts.DocumentDataInfo;
 using BIMPlatform.DocumentService;
-using BIMPlatform.ProjectDataInfo;
-using BIMPlatform.ProjectService;
 using Microsoft.AspNetCore.Mvc;
 using Platform.ToolKits.Base;
-using Platform.ToolKits.Base.Enum;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
@@ -15,7 +10,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace BIMPlatform.Controllers.Project

@@ -109,7 +109,7 @@ namespace BIMPlatform.ToolKits.Helper
                     catch(Exception ex)
                     {
                         error = ex.Message;
-                        //ServerLogger.Error("Failed to zip file", ex);
+                        //// ServerLogger.Error("Failed to zip file", ex);
                         return false;
                     }
                 }

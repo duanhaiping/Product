@@ -23,7 +23,33 @@ namespace BIMPlatform
                  * See the documentation for more:
                  * https://docs.abp.io/en/abp/latest/Object-Extensions
                  */
-            });
+                ObjectExtensionManager.Instance.AddOrUpdateProperty<IdentityRoleCreateDto, string>("RoleType");
+                ObjectExtensionManager.Instance.AddOrUpdateProperty<IdentityRoleDto, string>("RoleType");
+                ObjectExtensionManager.Instance.AddOrUpdateProperty<IdentityRoleUpdateDto, string>("RoleType");
+                ObjectExtensionManager.Instance
+               .AddOrUpdateProperty<bool>(
+                   new[]
+                   {
+                        typeof(IdentityUserDto),
+                        typeof(IdentityUserCreateDto),
+                        typeof(IdentityUserUpdateDto),
+                        typeof(ProfileDto),
+                        typeof(UpdateProfileDto)
+                   },
+                   "IsActivated"
+               )
+               .AddOrUpdateProperty<string>(
+                   new[]
+                   {
+                        typeof(IdentityUserDto),
+                        typeof(IdentityUserCreateDto),
+                        typeof(IdentityUserUpdateDto),
+                        typeof(ProfileDto),
+                        typeof(UpdateProfileDto)
+                   },
+                   "UserHeadImgUrl"
+               );
+                    });
         }
     }
 }

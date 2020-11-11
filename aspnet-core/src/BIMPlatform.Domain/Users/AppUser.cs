@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.Users;
 
@@ -39,6 +41,8 @@ namespace BIMPlatform.Users
 
         public virtual bool PhoneNumberConfirmed { get; private set; }
 
+        [NotMapped]
+        public override Dictionary<string, object> ExtraProperties { get; protected set; } 
         #endregion
 
         /* Add your own properties here. Example:
@@ -56,9 +60,11 @@ namespace BIMPlatform.Users
          * schema change to the database.
          */
 
+        public string UserHeadImgUrl { get; set; }
+        public bool IsActivated { get; set; }
         private AppUser()
         {
-            
+
         }
     }
 }

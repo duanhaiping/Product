@@ -1,13 +1,17 @@
 ﻿using BIMPlatform.Configurations;
 using BIMPlatform.Swagger.Filters;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace BIMPlatform.Swagger
 {
@@ -28,29 +32,93 @@ namespace BIMPlatform.Swagger
         /// </summary>
         private static readonly List<SwaggerApiInfo> ApiInfos = new List<SwaggerApiInfo>()
         {
-
-            new SwaggerApiInfo
-            {
-                UrlPrefix = ApiGrouping.GroupName_v3,
-                Name = "通用公共接口",
+            new SwaggerApiInfo{
+                UrlPrefix = ApiGrouping.GroupName_v1,
+                Name = "框架层接口- Abp vnext框架自带接口",
                 OpenApiInfo = new OpenApiInfo
                 {
-                    Version = version,
-                    Title = "BIMPlus - 通用公共接口",
+                    Version = ApiGrouping.GroupName_v1,
+                    Title = "BIMPlus - Abp系统默认模块接口",
                     Description = description
                 }
             },
             new SwaggerApiInfo
             {
-                UrlPrefix = ApiGrouping.GroupName_v1,
-                Name = "基础模块接口",
+                UrlPrefix = ApiGrouping.GroupName_v2,
+                Name = "宿主模块-平台管理角色使用的接口",
                 OpenApiInfo = new OpenApiInfo
                 {
-                    Version = version,
-                    Title = "BIMPlus - 基础模块接口",
+                    Version = ApiGrouping.GroupName_v2,
+                    Title = "BIMPlus - 平台管理角色使用的接口",
                     Description = description
                 }
-            }
+            },
+             new SwaggerApiInfo
+            {
+                UrlPrefix = ApiGrouping.GroupName_v3,
+                Name = "租户系统模块-企业级系统管理模块接口",
+                OpenApiInfo = new OpenApiInfo
+                {
+                    Version = ApiGrouping.GroupName_v3,
+                    Title = "BIMPlus - 企业级系统管理模块接口",
+                    Description = description
+                }
+             },
+            new SwaggerApiInfo
+            {
+                UrlPrefix = ApiGrouping.GroupName_v4,
+                Name = "租户项目模块接口--企业级项目管理模块接口",
+                OpenApiInfo = new OpenApiInfo
+                {
+                    Version = ApiGrouping.GroupName_v4,
+                    Title = "BIMPlus - 项目模块接口",
+                    Description = description
+                }
+            },
+            new SwaggerApiInfo
+            {
+                UrlPrefix = ApiGrouping.GroupName_v5,
+                Name = "租户项目模块接口--第三方接口钉钉",
+                OpenApiInfo = new OpenApiInfo
+                {
+                    Version = ApiGrouping.GroupName_v5,
+                    Title = "BIMPlus - 第三方接口钉钉",
+                    Description = description
+                }
+            },
+            new SwaggerApiInfo
+            {
+                UrlPrefix = ApiGrouping.GroupName_v6,
+                Name = "租户项目模块接口--第三方接口微信",
+                OpenApiInfo = new OpenApiInfo
+                {
+                    Version = ApiGrouping.GroupName_v6,
+                    Title = "BIMPlus - 第三方接口微信",
+                    Description = description
+                }
+             },
+            new SwaggerApiInfo
+            {
+                UrlPrefix = ApiGrouping.GroupName_v7,
+                Name = "租户项目模块接口--第三方接口QQ",
+                OpenApiInfo = new OpenApiInfo
+                {
+                    Version = ApiGrouping.GroupName_v7,
+                    Title = "BIMPlus - 第三方接口QQ",
+                    Description = description
+                }
+             },
+             new SwaggerApiInfo
+            {
+                UrlPrefix = ApiGrouping.GroupName_v999,
+                Name = "租户项目模块接口--未定义分组",
+                OpenApiInfo = new OpenApiInfo
+                {
+                    Version = ApiGrouping.GroupName_v999,
+                    Title = "BIMPlus - 未定义分组",
+                    Description = description
+                }
+             },
         };
 
         /// <summary>
@@ -62,8 +130,16 @@ namespace BIMPlatform.Swagger
         {
             return services.AddSwaggerGen(options =>
             {
-                //options.SwaggerDoc("v1", new OpenApiInfo { Title = "BIMPlatform API", Version = "v1" });
-                options.DocInclusionPredicate((docName, description) => true);
+                options.DocInclusionPredicate((docName, description) =>
+                {
+                    if (!description.TryGetMethodInfo(out MethodInfo methodInfo)) return false;
+                    var version = methodInfo.DeclaringType.GetCustomAttributes(true).OfType<ApiExplorerSettingsAttribute>().Select(attr => attr.GroupName);
+                    if (docName == ApiGrouping.GroupName_v1 && version.FirstOrDefault() == null)
+                    {
+                        return true;
+                    }
+                    return version.Any(v => v.ToString() == docName);
+                });
                 // 遍历并应用Swagger分组信息
                 ApiInfos.ForEach(x =>
                 {
@@ -93,7 +169,7 @@ namespace BIMPlatform.Swagger
                 #endregion
 
                 // 应用Controller的API文档描述信息
-                options.DocumentFilter<SwaggerDocumentFilter>();
+                // options.DocumentFilter<SwaggerDocumentFilter>();
                 options.OperationFilter<AddBIMPlatformHeaderParameter>();
             });
         }
@@ -113,7 +189,7 @@ namespace BIMPlatform.Swagger
                 });
 
                 // 模型的默认扩展深度，设置为 -1 完全隐藏模型
-                options.DefaultModelsExpandDepth(-1);
+                //options.DefaultModelsExpandDepth(-1);
                 // API文档仅展开标记
                 options.DocExpansion(DocExpansion.List);
                 // API前缀设置为空

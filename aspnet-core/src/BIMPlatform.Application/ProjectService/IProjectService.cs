@@ -1,7 +1,5 @@
-﻿
-using BIMPlatform.Application.Contracts;
-using BIMPlatform.Application.Contracts.ProjectDataInfo;
-using BIMPlatform.ProjectDataInfo;
+﻿using BIMPlatform.Application.Contracts;
+using BIMPlatform.Application.Contracts.ProjectDto;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,9 +10,11 @@ namespace BIMPlatform.ProjectService
     public interface IProjectService 
     {
         Task<PagedResultDto<ProjectDto>> GetProjects(BasePagedAndSortedResultRequestDto filter);
-        Task<ProjectDto> GetProjectAsync(Guid projectID);
+        Task<IList<ProjectDto>> GetProjects();
+        Task<ProjectDto> GetProjectAsync(int projectID);
         Task CreateAsync(ProjectCreateParams projectDto);
         Task<ProjectDto> UpdateAsync(ProjectUpdateParams projectDto);
-        Task DeleteAsync(Guid projectID);
+        Task DeleteAsync(int projectID);
+        Task<ProjectDto> GetCurrentUserProject();
     }
 }

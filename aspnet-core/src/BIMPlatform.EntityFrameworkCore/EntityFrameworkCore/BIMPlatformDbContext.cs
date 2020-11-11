@@ -22,14 +22,14 @@ namespace BIMPlatform.EntityFrameworkCore
     public class BIMPlatformDbContext : AbpDbContext<BIMPlatformDbContext>
     {
         public DbSet<AppUser> Users { get; set; }
-        
         public DbSet<Projects.Project> Projects { get; set; }
 
-        public DbSet<Document.Document> Documents { get; set; }
+        public DbSet<Projects.ProjectUser> ProjectUsers { get; set; }
+        //public DbSet<Document.Document> Documents { get; set; }
 
-        public DbSet<Document.DocumentVersion> DocumentVersion { get; set; }
+        //public DbSet<Document.DocumentVersion> DocumentVersion { get; set; }
 
-        public DbSet<Document.DocumentFolder> DocumentFolder { get; set; }
+        //public DbSet<Document.DocumentFolder> DocumentFolder { get; set; }
         /* Add DbSet properties for your Aggregate Roots / Entities here.
          * Also map them inside BIMPlatformDbContextModelCreatingExtensions.ConfigureBIMPlatform
          */
@@ -52,14 +52,15 @@ namespace BIMPlatform.EntityFrameworkCore
                 
                 b.ConfigureByConvention();
                 b.ConfigureAbpUser();
-
+                b.Property(x => x.IsActivated).IsRequired(true).HasDefaultValue(true).HasColumnName(nameof(AppUser.IsActivated));
+                b.Property(x => x.UserHeadImgUrl).IsRequired(false).HasMaxLength(100).HasColumnName(nameof(AppUser.UserHeadImgUrl));
+               
                 /* Configure mappings for your additional properties
                  * Also see the BIMPlatformEfCoreEntityExtensionMappings class
                  */
             });
-           
             /* Configure your own tables/entities inside the ConfigureBIMPlatform method */
-
+           
             builder.ConfigureBIMPlatform();
         }
     }

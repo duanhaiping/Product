@@ -70,5 +70,8 @@ namespace BIMPlatform.Application.Contracts.DocumentDataInfo
         public string FolderName { get; set; }
         public string DocumentComment { get; set; }
         public ImageFileItem ImageFileItem { get; set; }
+
+        public UserDataInfo.UserDto CreationUserInfo { get; set; }
+        public string ParentFolderName { get; set; }
     }
 }

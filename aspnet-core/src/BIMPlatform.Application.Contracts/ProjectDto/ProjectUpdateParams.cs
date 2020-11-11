@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace BIMPlatform.Application.Contracts.ProjectDataInfo
+namespace BIMPlatform.Application.Contracts.ProjectDto
 {
     public class ProjectUpdateParams
     {
         [Required]
-        public Guid ID { get; set; }
+        public int ID { get; set; }
         /// <summary>
         ///  名称
         /// </summary>

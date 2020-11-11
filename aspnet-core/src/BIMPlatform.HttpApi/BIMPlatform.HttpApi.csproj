@@ -14,8 +14,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\Document\**" />
     <Compile Remove="Controllers\OSS\**" />
+    <EmbeddedResource Remove="Controllers\Document\**" />
     <EmbeddedResource Remove="Controllers\OSS\**" />
+    <None Remove="Controllers\Document\**" />
     <None Remove="Controllers\OSS\**" />
   </ItemGroup>
 

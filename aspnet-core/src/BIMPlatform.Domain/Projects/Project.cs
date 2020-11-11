@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Volo.Abp;
 using Volo.Abp.Auditing;
 using Volo.Abp.Domain.Entities;
@@ -7,7 +8,7 @@ using Volo.Abp.MultiTenancy;
 
 namespace BIMPlatform.Projects
 {
-    public class Project : Entity<Guid>, IAuditedObject, IDeletionAuditedObject, IMultiTenant
+    public class Project : Entity<int>, IAuditedObject, IDeletionAuditedObject, IMultiTenant
     {
         public string Name { get; set; }
         public string Description { get; set; }
@@ -32,6 +33,7 @@ namespace BIMPlatform.Projects
         public Guid? DeleterId { get ; set ; }
         public DateTime? DeletionTime { get ; set ; }
         public Guid? TenantId { get; set; }
-      
+
+        
     }
 }

@@ -248,6 +248,7 @@ export default {
     fetchData(id) {
       this.$axios.gets('/api/identity/roles/' + id).then(response => {
         this.form = response
+        this.form.ExtraProperties="{'test':'test'}"
       })
     },
     handleFilter() {

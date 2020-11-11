@@ -1,7 +1,6 @@
 ﻿using BIMPlatform.Application.Contracts;
-using BIMPlatform.Application.Contracts.ProjectDataInfo;
+using BIMPlatform.Application.Contracts.ProjectDto;
 using BIMPlatform.Project.Repositories;
-using BIMPlatform.ProjectDataInfo;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -10,14 +9,14 @@ using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Data;
-using Volo.Abp.MultiTenancy;
 
 namespace BIMPlatform.ProjectService.impl
 {
     public class ProjectService : BaseService, IProjectService
     {
         private readonly IProjectRepository ProjectRepository;
-       
+
+        //private readonly IProjectUserRepository ProjectUserRepository; 
         private readonly IDataFilter DataFilter;
         public ProjectService(IProjectRepository projectRepository, IDataFilter dataFilter ,IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
@@ -40,15 +39,20 @@ namespace BIMPlatform.ProjectService.impl
             return Task.CompletedTask;
         }
 
-        public async Task DeleteAsync(Guid projectID)
+        public async Task DeleteAsync(int projectID)
         {
             Projects.Project project = await ProjectRepository.FindAsync(c => c.Id==projectID);
             await ProjectRepository.DeleteAsync(project);
             
             
         }
-       
-        public async  Task<ProjectDto> GetProjectAsync(Guid projectID)
+
+        public Task<ProjectDto> GetCurrentUserProject()
+        {
+            throw new NotImplementedException();
+        }
+
+        public async  Task<ProjectDto> GetProjectAsync(int projectID)
         {
             Projects.Project project = await ProjectRepository.FindAsync(c => c.Id == projectID);
             return ObjectMapper.Map<Projects.Project, ProjectDto>(project);
@@ -69,9 +73,18 @@ namespace BIMPlatform.ProjectService.impl
                 return result;
             }
         }
+        public async Task<IList<ProjectDto>> GetProjects()
+        {
+            // 默认开启租户过滤，所以不在展示
+            using (DataFilter.Enable<ISoftDelete>())
+            {
+                var target = (await ProjectRepository.GetListAsync());
+                return ObjectMapper.Map<IList<Projects.Project>, List<ProjectDto>>(target); ;
+            }
+        }
         public async Task<ProjectDto> UpdateAsync(ProjectUpdateParams projectDto)
         {
-            Projects.Project project = await ProjectRepository.FindAsync(projectDto.ID);
+            Projects.Project project = await ProjectRepository.FindAsync(c=>c.Id==projectDto.ID);
             if (project == null)
                 throw new ArgumentException(L["ProjectError:NameDuplicate"]);
             if(!projectDto.Name.IsNullOrEmpty() && !projectDto.Name.Equals(project.Name))
