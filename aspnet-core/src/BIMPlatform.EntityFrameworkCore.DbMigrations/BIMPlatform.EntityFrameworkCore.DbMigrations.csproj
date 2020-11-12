@@ -88,6 +88,10 @@
     <Compile Remove="Migrations\20201111033906_update.Designer.cs" />
     <Compile Remove="Migrations\20201111034615_inital.cs" />
     <Compile Remove="Migrations\20201111034615_inital.Designer.cs" />
+    <Compile Remove="Migrations\20201111100403_project.cs" />
+    <Compile Remove="Migrations\20201111100403_project.Designer.cs" />
+    <Compile Remove="Migrations\20201112061324_addProjectUser.cs" />
+    <Compile Remove="Migrations\20201112061324_addProjectUser.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

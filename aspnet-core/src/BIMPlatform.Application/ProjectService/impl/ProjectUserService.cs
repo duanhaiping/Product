@@ -1,4 +1,5 @@
 ﻿using BIMPlatform.Application.Contracts;
+using BIMPlatform.Application.Contracts.ProjectDto;
 using BIMPlatform.Application.Contracts.UserDataInfo;
 using BIMPlatform.Infrastructure.Project.Services.Interfaces;
 using BIMPlatform.Project.Repositories;
@@ -32,7 +33,7 @@ namespace BIMPlatform.Module.Project.Services.Default
             IDataFilter dataFilter,
             IUserRepository userRepository,
             IProjectUserRepository projectUserRepository,
-            IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor, projectRepository)
         {
             UserRepository = userRepository;
             ProjectUserRepository = projectUserRepository;
@@ -41,8 +42,10 @@ namespace BIMPlatform.Module.Project.Services.Default
         }
         public async Task AddUserToProject(List<Guid> userIdList)
         {
-            var existed = ProjectUserRepository.FindList(c=>c.Project.Id==CurrentProject).Select(c=>c.UserId);
-            var project =await ProjectRepository.FindAsync(c => c.Id == CurrentProject);
+           
+            string[] include = new string[] { "Project", "User" };
+            var existed = ProjectUserRepository.FindList(c=>c.Project== CurrentProject, include).Select(c=>c.User.Id);
+           
             IList<ProjectUser> projectUsers = new List<ProjectUser>();
             foreach (var item in userIdList)
             {
@@ -50,26 +53,26 @@ namespace BIMPlatform.Module.Project.Services.Default
                 {
                     ProjectUser temp = new ProjectUser
                     {
-                        Project = project,
-                        UserId = (await UserRepository.FindAsync(item)).Id
+                        Project = CurrentProject,
+                        User = UserRepository.FindByKeyValues(item)
                     };
-                    ProjectUserRepository.InsertAsync(temp);
-                   
+                    await ProjectUserRepository.InsertAsync(temp);
+
                 }
             }
-            //ProjectUserRepository.InsertAsync(projectUsers);
+           
 
         }
 
         public async Task DeleteProjectUser( Guid userId)
         {
-            await ProjectUserRepository.DeleteAsync(c => c.Project.Id == CurrentProject && c.UserId == userId);
+            await ProjectUserRepository.DeleteAsync(c => c.Project == CurrentProject && c.User.Id == userId);
         }
 
         public async Task<PagedResultDto<UserDto>> GetProjectUserList(BasePagedAndSortedResultRequestDto filter)
         {
             PagedResultDto<UserDto> result;
-            var userid = ProjectUserRepository.Query(c =>c.Project.Id== CurrentProject).Select(c=>c.UserId);
+            var userid = ProjectUserRepository.Query(c =>c.Project == CurrentProject).Select(c=>c.User.Id);
             var target = UserRepository.Query(c => userid.Contains(c.Id) && c.UserName.Contains(filter.Filter));
             target = !string.IsNullOrEmpty(filter.Sorting) ? target.OrderBy(c => filter.Sorting) : target.OrderByDescending(t => t.CreationTime);
             var count = target.Count();
@@ -77,14 +80,30 @@ namespace BIMPlatform.Module.Project.Services.Default
             result = new PagedResultDto<UserDto>(count, ObjectMapper.Map<IList<AppUser>, List<UserDto>>(projectList));
             return result;
         }
-
+        public async Task<PagedResultDto<ProjectDto>> GetUserProjectList(BasePagedAndSortedResultRequestDto filter)
+        {
+            PagedResultDto<ProjectDto> result;
+            var currentUser = UserRepository.FindByKeyValues(CurrentUser.Id);
+            string[] include = new string[] { "Project", "User" };
+            var project= ProjectUserRepository.
+                Query(c => c.User == currentUser, include).
+                WhereIf(!filter.Filter.IsNullOrWhiteSpace(), c => c.Project.Name.Contains(filter.Filter)).Select(c=>c.Project);
+            // 排序
+            project = !string.IsNullOrEmpty(filter.Sorting) ? project.OrderBy(c => filter.Sorting) : project.OrderByDescending(t => t.CreationTime);
+            var count = project.Count();
+            var projectList = project.Skip(filter.SkipCount).Take(filter.MaxResultCount).ToList();
+            result = new PagedResultDto<ProjectDto>(count, ObjectMapper.Map<IList<Projects.Project>, List<ProjectDto>>(projectList));
+            return result;
+        }
         public async Task<PagedResultDto<UserDto>> GetTenantUserForAddToProject(BasePagedAndSortedResultRequestDto filter)
         {
             PagedResultDto<UserDto> result;
 
             using (DataFilter.Enable<ISoftDelete>())
             {
-                var projectUsers =(await ProjectUserRepository.GetListAsync()).WhereIf(CurrentProject > 0, c => c.Project.Id == CurrentProject). Select(c => c.UserId).ToList();
+                string[] include = new string[] { "Project", "User" };
+                var projectUsers =ProjectUserRepository.FindList(c=>c.Project==CurrentProject, include). Select(c => c.User.Id).ToList();
+              
                 var target = (await UserRepository.GetListAsync())
                     .WhereIf(!filter.Filter.IsNullOrWhiteSpace(), t => t.Name.Contains(filter.Filter))
                     .WhereIf(true,c=>c.IsActivated==true)
@@ -97,5 +116,7 @@ namespace BIMPlatform.Module.Project.Services.Default
 
             return result;
         }
+
+    
     }
 }

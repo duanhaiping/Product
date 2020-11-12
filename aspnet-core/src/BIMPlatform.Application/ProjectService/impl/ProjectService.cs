@@ -18,7 +18,11 @@ namespace BIMPlatform.ProjectService.impl
 
         //private readonly IProjectUserRepository ProjectUserRepository; 
         private readonly IDataFilter DataFilter;
-        public ProjectService(IProjectRepository projectRepository, IDataFilter dataFilter ,IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+        public ProjectService(
+            IProjectRepository projectRepository, 
+            IDataFilter dataFilter ,
+            IHttpContextAccessor httpContextAccessor) : 
+            base(httpContextAccessor, projectRepository)
         {
            
             DataFilter = dataFilter;
@@ -64,7 +68,8 @@ namespace BIMPlatform.ProjectService.impl
             // 默认开启租户过滤，所以不在展示
             using (DataFilter.Enable<ISoftDelete>())
             {
-                var target = (await ProjectRepository.GetListAsync()).WhereIf(!filter.Filter.IsNullOrWhiteSpace(),t=>t.Name.Contains(filter.Filter));
+                var target = (await ProjectRepository.GetListAsync()).
+                    WhereIf(!filter.Filter.IsNullOrWhiteSpace(),t=>t.Name.Contains(filter.Filter));
                 // 排序
                 target = !string.IsNullOrEmpty(filter.Sorting) ? target.OrderBy(c=> filter.Sorting) : target.OrderByDescending(t => t.CreationTime);
                 var count = target.Count();

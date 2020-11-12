@@ -1,4 +1,5 @@
 ﻿using BIMPlatform.Localization;
+using BIMPlatform.Project.Repositories;
 using Microsoft.AspNetCore.Http;
 using Volo.Abp.Application.Services;
 
@@ -9,12 +10,19 @@ namespace BIMPlatform
     public abstract class BaseService : ApplicationService
     {
         //public IEventService EventService { get; private set; }
-        public int CurrentProject;
+        public Projects.Project CurrentProject;
         protected IHttpContextAccessor httpContext;
-        protected BaseService(IHttpContextAccessor  httpContextAccessor)
+        private readonly IProjectRepository ProjectRepository;
+
+        protected BaseService(IHttpContextAccessor  httpContextAccessor, IProjectRepository projectRepository)
         {
             httpContext = httpContextAccessor;
-            CurrentProject = httpContextAccessor.HttpContext.Request.Headers.ContainsKey("__currentproject")? int.Parse( httpContextAccessor.HttpContext.Request.Headers["__currentproject"]) :0;
+            ProjectRepository = projectRepository;
+            int currentProjectId = 0;
+            if (httpContextAccessor.HttpContext.Request.Headers.ContainsKey("__currentproject")) {
+                int.TryParse(httpContextAccessor.HttpContext.Request.Headers["__currentproject"], out  currentProjectId);
+                CurrentProject = ProjectRepository.FindByKeyValues(currentProjectId);
+            }
             LocalizationResource = typeof(BIMPlatformResource);
         }
        

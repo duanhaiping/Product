@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BIMPlatform.Project.Repositories;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,7 +8,8 @@ namespace BIMPlatform.TestService
 {
     public class TestService : BaseService
     {
-        public TestService(IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+        public TestService(IHttpContextAccessor httpContextAccessor, IProjectRepository projectRepository) 
+            : base(httpContextAccessor, projectRepository)
         {
 
         }
@@ -16,7 +18,7 @@ namespace BIMPlatform.TestService
             return L["ProjectError:NameDuplicate"];
         }
 
-        public int TestCurrentProject()
+        public Projects.Project TestCurrentProject()
         {
             return CurrentProject;
         }

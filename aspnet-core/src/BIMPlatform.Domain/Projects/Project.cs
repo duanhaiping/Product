@@ -1,5 +1,8 @@
-﻿using System;
+﻿using BIMPlatform.Users;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Volo.Abp;
 using Volo.Abp.Auditing;
 using Volo.Abp.Domain.Entities;
@@ -21,6 +24,10 @@ namespace BIMPlatform.Projects
         public string SupervisingUnit { get; set; }
         public string ConsultingUnit { get; set; }
         public float Area { get; set; }
+        //[ForeignKey("Principal")]
+        //[Required]
+        //public AppUser Principal { get; set; }
+
         public Guid Principal { get; set; }
         public DateTime CompleteDate { get; set; }
         public float Longitude { get; set; }

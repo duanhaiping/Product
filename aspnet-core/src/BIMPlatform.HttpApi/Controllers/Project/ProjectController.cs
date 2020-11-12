@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 
 namespace BIMPlatform.Controllers.Project
 {
+    [Area("project")]
+    [Route("api/project")]
     /// <summary>
     /// 项目管理
     /// </summary>
@@ -41,6 +43,7 @@ namespace BIMPlatform.Controllers.Project
         /// <returns></returns>
         [HttpGet]
         [SwaggerResponse(200, "", typeof(ServiceResult<IList<ProjectDto>>))]
+        [Route("page")]
         public async Task<ServiceResult> GetProjects([FromQuery]BasePagedAndSortedResultRequestDto filter)
         {
             var project = await ProjectService.GetProjects(filter);
@@ -52,7 +55,6 @@ namespace BIMPlatform.Controllers.Project
         /// <param name="createParams"></param>
         /// <returns></returns>
         [HttpPost]
-
         public async Task<ServiceResult> Create([FromBody]ProjectCreateParams createParams)
         {
             await ProjectService.CreateAsync(createParams);
@@ -83,20 +85,12 @@ namespace BIMPlatform.Controllers.Project
             return await ServiceResult.IsSuccess();
         }
         /// <summary>
-        /// 获取当前用户的项目信息
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ServiceResult> GetUserProjectInfo()
-        {
-            //ProjectUserService.GetProjectUserList
-            return await ServiceResult.IsSuccess();
-        }
-        /// <summary>
         /// 获取项目列表
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [Route("all")]
+        [SwaggerResponse(200, "", typeof(ServiceResult<IList<ProjectDto>>))]
         public async Task<ServiceResult> GetProjectList()
         {
             var project = await ProjectService.GetProjects();

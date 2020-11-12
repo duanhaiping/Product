@@ -4,6 +4,8 @@ using BIMPlatform.ToolKits.Helper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Platform.ToolKits.Base;
+using Swashbuckle.AspNetCore.Annotations;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Data;
 using Volo.Abp.Identity;
@@ -15,7 +17,6 @@ namespace BIMPlatform.Controllers
     [Route("api/identity/roles")]
 
     [ApiExplorerSettings(GroupName = ApiGrouping.GroupName_v1)]
-    [AllowAnonymous]
     public class BIMIdentityRoleController : BaseController
     {
         protected IdentityRoleAppService RoleAppService { get; }
@@ -30,6 +31,7 @@ namespace BIMPlatform.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("bimCreate")]
+        [SwaggerResponse(200, "", typeof(ServiceResult<IdentityRoleDto>))]
         public async Task<ServiceResult> BIMCreate([FromBody]BIMIdentityRoleCreateDto input)
         {
             IdentityRoleCreateDto createDto = new IdentityRoleCreateDto

@@ -15,20 +15,21 @@ namespace BIMPlatform.EntityFrameworkCore
            
 
             Check.NotNull(builder, nameof(builder));
-           
+
             builder.Entity<Projects.Project>(b =>
             {
                 b.ToTable(BIMPlatformConsts.DbTablePrefix_Project + "Project");
                 b.Property(x => x.Description).HasMaxLength(200);
-               
+
                 b.Property(x => x.Name).HasMaxLength(100).IsRequired();
                 b.Property(x => x.IsDeleted).HasDefaultValue(false);
             });
             builder.Entity<Projects.ProjectUser>(b =>
             {
                 b.ToTable(BIMPlatformConsts.DbTablePrefix_Project + "ProjectUser");
+
                 b.ConfigureAuditedAggregateRoot();
-               
+
             });
             //builder.Entity<Document.Document>(b =>
             //{

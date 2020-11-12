@@ -422,26 +422,6 @@ namespace BIMPlatform.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Pro_ProjectUser",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    ProjectId = table.Column<int>(nullable: false),
-                    UserId = table.Column<Guid>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Pro_ProjectUser", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Pro_ProjectUser_Pro_Project_ProjectId",
-                        column: x => x.ProjectId,
-                        principalTable: "Pro_Project",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Sys_ApiClaims",
                 columns: table => new
                 {
@@ -963,11 +943,6 @@ namespace BIMPlatform.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Pro_ProjectUser_ProjectId",
-                table: "Pro_ProjectUser",
-                column: "ProjectId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Sys_BackgroundJobs_IsAbandoned_NextTryTime",
                 table: "Sys_BackgroundJobs",
                 columns: new[] { "IsAbandoned", "NextTryTime" });
@@ -1128,7 +1103,7 @@ namespace BIMPlatform.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Pro_ProjectUser");
+                name: "Pro_Project");
 
             migrationBuilder.DropTable(
                 name: "Sys_ApiClaims");
@@ -1219,9 +1194,6 @@ namespace BIMPlatform.Migrations
 
             migrationBuilder.DropTable(
                 name: "Tnt_TenantConnectionStrings");
-
-            migrationBuilder.DropTable(
-                name: "Pro_Project");
 
             migrationBuilder.DropTable(
                 name: "Sys_ApiScopes");

@@ -1,4 +1,5 @@
 ﻿using BIMPlatform.Application.Contracts;
+using BIMPlatform.Application.Contracts.ProjectDto;
 using BIMPlatform.Application.Contracts.UserDataInfo;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace BIMPlatform.Infrastructure.Project.Services.Interfaces
     {
         Task<PagedResultDto<UserDto>> GetProjectUserList(BasePagedAndSortedResultRequestDto filter);
 
+        Task<PagedResultDto<ProjectDto>> GetUserProjectList(BasePagedAndSortedResultRequestDto filter);
         Task AddUserToProject(List<Guid> userIdList);
         /// <summary>
         /// 获取可添加成员列表

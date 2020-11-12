@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BIMPlatform.Application.Contracts.OSS
+namespace BIMPlatform
 {
     public class OssCallbackParam
     {

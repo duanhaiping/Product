@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="IdentityRoleCreateDto.cs" />
     <Compile Remove="ProjectDto\EntityNamingRule.cs" />
     <Compile Remove="ProjectDto\GroupProjectInfo.cs" />
     <Compile Remove="ProjectDto\LightProjectDataInfo.cs" />

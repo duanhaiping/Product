@@ -10,7 +10,7 @@ using Volo.Abp.EntityFrameworkCore;
 namespace BIMPlatform.Migrations
 {
     [DbContext(typeof(BIMPlatformMigrationsDbContext))]
-    [Migration("20201111042317_inital")]
+    [Migration("20201112061036_inital")]
     partial class inital
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -104,26 +104,6 @@ namespace BIMPlatform.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Pro_Project");
-                });
-
-            modelBuilder.Entity("BIMPlatform.Projects.ProjectUser", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ProjectId")
-                        .IsRequired()
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("Pro_ProjectUser");
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLog", b =>
@@ -1800,15 +1780,6 @@ namespace BIMPlatform.Migrations
                     b.HasKey("TenantId", "Name");
 
                     b.ToTable("Tnt_TenantConnectionStrings");
-                });
-
-            modelBuilder.Entity("BIMPlatform.Projects.ProjectUser", b =>
-                {
-                    b.HasOne("BIMPlatform.Projects.Project", "Project")
-                        .WithMany()
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLogAction", b =>
