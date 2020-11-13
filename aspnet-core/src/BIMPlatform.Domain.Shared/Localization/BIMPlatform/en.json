@@ -9,7 +9,28 @@
     "Permission:Update": "Update",
     "Permission:Delete": "Delete",
     "Permission:Default": "View",
-    "ProjectError:NameDuplicate": "An item of the same name already exists",
-    "ProjectError:NullObject":"the item is not found" 
+    /**
+      Project
+      */
+    "Error:Project:NameDuplicate": "An item of the same name already exists",
+    "Error:Project:NullObject": "the project is not found",
+    /*
+    User
+    */
+    "ErrorUserError:NullUserId": "The user ID was ",
+    "Error:User:NotExisted": "The user was not found:{0}",
+    /**
+      Document
+      */
+    "Error:Document:NotExist": "文件不存在",
+    "Error:Document:NullNameOrSuffix": "文件名称或后缀不能为空",
+    "Error:DocumentFolder:NullName": "文件夹名称不能为空",
+    "Error:DocumentFolder:FolderNotExist": "文件夹不存在",
+    "Error:DocumentFolder:DuplicateFolderName": "该名称文件夹已存在",
+    "Error:DocumentFolder:RequireCurrentUserInfo": "需要当前用户信息",
+    "Error:DocumentFolder:RequireFolderIDParameter": "需要文件夹ID参数",
+    "Error:DocumentFolder:RequireDocumnetVersionIDParameter": "需要文件版本ID参数",
+    "Error:DocumentFolder:NoFileToDownload": "没有可下载的文件",
+    "Error:DocumentFolder:SameParentFolderError": "目标文件夹与源文件夹相同"
   }
 }

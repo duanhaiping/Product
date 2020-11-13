@@ -15,6 +15,6 @@ namespace BIMPlatform.ProjectService
         Task CreateAsync(ProjectCreateParams projectDto);
         Task<ProjectDto> UpdateAsync(ProjectUpdateParams projectDto);
         Task DeleteAsync(int projectID);
-        Task<ProjectDto> GetCurrentUserProject();
+       
     }
 }

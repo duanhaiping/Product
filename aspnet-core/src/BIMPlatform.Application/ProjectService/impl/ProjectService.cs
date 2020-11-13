@@ -1,6 +1,9 @@
 ﻿using BIMPlatform.Application.Contracts;
 using BIMPlatform.Application.Contracts.ProjectDto;
 using BIMPlatform.Project.Repositories;
+using BIMPlatform.Projects;
+using BIMPlatform.Projects.Repositories;
+using BIMPlatform.Users.Repositories;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -16,19 +19,23 @@ namespace BIMPlatform.ProjectService.impl
     {
         private readonly IProjectRepository ProjectRepository;
 
-        //private readonly IProjectUserRepository ProjectUserRepository; 
+        private readonly IProjectUserRepository ProjectUserRepository;
+        private readonly IUserRepository UserRepository;
         private readonly IDataFilter DataFilter;
         public ProjectService(
-            IProjectRepository projectRepository, 
-            IDataFilter dataFilter ,
-            IHttpContextAccessor httpContextAccessor) : 
+            IProjectRepository projectRepository,
+            IProjectUserRepository projectUsersRepository,
+            IUserRepository usreRepository,
+            IDataFilter dataFilter,
+            IHttpContextAccessor httpContextAccessor) :
             base(httpContextAccessor, projectRepository)
         {
-           
+            UserRepository = usreRepository;
             DataFilter = dataFilter;
             ProjectRepository = projectRepository;
-        } 
-        public Task CreateAsync(ProjectCreateParams projectDto)
+            ProjectUserRepository = projectUsersRepository;
+        }
+        public async Task CreateAsync(ProjectCreateParams projectDto)
         {
             Projects.Project project = ObjectMapper.Map<ProjectCreateParams, Projects.Project>(projectDto);
             project.CreationTime = DateTime.Now;
@@ -39,22 +46,29 @@ namespace BIMPlatform.ProjectService.impl
             var existed=  ProjectRepository.FirstOrDefault(c=>c.Name==project.Name );
             if (existed != null)
                 throw new ArgumentException(L["ProjectError:NameDuplicate"]);
-            ProjectRepository.InsertAsync(project);
-            return Task.CompletedTask;
+            var insertResult=await ProjectRepository.InsertAsync(project);
+            var principal= UserRepository.FindByKeyValues(project.Principal);
+            if(principal == null)
+                throw new ArgumentException(string.Format(L["Error:User:NotExisted"], project.Principal) );
+            ProjectUser projectUser = new ProjectUser { Project = insertResult, User = principal };
+            await ProjectUserRepository.InsertAsync(projectUser);
+            // TODO: add default project role 
+
+            // TODO: add Notification To  principal if currentuser is not principal 
+
+            //UnresolvedMergeConflict:s
+            await Task.CompletedTask;
         }
 
         public async Task DeleteAsync(int projectID)
         {
             Projects.Project project = await ProjectRepository.FindAsync(c => c.Id==projectID);
+            // TODO: should delete project user ??
+
+            //TODO :should Notification  to any Project user 
             await ProjectRepository.DeleteAsync(project);
-            
-            
         }
 
-        public Task<ProjectDto> GetCurrentUserProject()
-        {
-            throw new NotImplementedException();
-        }
 
         public async  Task<ProjectDto> GetProjectAsync(int projectID)
         {
@@ -153,6 +167,10 @@ namespace BIMPlatform.ProjectService.impl
             {
                 project.Principal = projectDto.Principal;
             }
+            // TODO : Notification to new Principal, old  Principal how to notification ?? 
+            // TODO : If the new principal is not in the project member list, it is added to the member list
+
+            // TODO : What about the original principal,delete or remove principal role? the pendding issue ??  
             project.LastModificationTime = Clock.Now;
             project.LastModifierId = this.CurrentUser.Id;
            return ObjectMapper.Map<Projects.Project, ProjectDto>(await ProjectRepository.UpdateAsync(project));

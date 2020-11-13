@@ -27,6 +27,20 @@
 
 ​			Error:Project:NameDuplicate(错误信息：项目模块：名称重复)
 
+> API 请求规范
+
+Get:获取数据
+
+Delete:删除操作
+
+Post:新增
+
+Put :更新  替换整个资源
+
+Pach:指定更改
+
+
+
 
 
 

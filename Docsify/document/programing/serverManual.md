@@ -163,4 +163,7 @@ git  的目录下有三个文件 aspnet-core，Docsify和vue-element-admin ，Do
       [SwaggerResponse(200, "", typeof(ServiceResult<IList<ProjectDto>>))]
 
      各个相应状态的返回包装类型，swagger 可见
+   
+   > TODO 待办事项(待办任务列表)
 
+在项目中暂时为解决的问题的地方增加 // TODO: 【描述】，在视图=》任务列表中查看当前待办事项，任务结束后删除 // TODO: 【描述】

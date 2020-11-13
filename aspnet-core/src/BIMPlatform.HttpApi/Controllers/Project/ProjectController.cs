@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 
 namespace BIMPlatform.Controllers.Project
 {
-    [Area("project")]
-    [Route("api/project")]
     /// <summary>
     /// 项目管理
     /// </summary>
+    [Area("project")]
+    [Route("api/project")]
     [ApiExplorerSettings(GroupName = ApiGrouping.GroupName_v4)]
     public class ProjectController : BaseController
     {
